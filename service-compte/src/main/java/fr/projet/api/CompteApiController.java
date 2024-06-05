@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import fr.projet.feignClient.CompteFeignClient;
 import fr.projet.model.Compte;
 import fr.projet.repository.CompteRepository;
 import fr.projet.request.CreateCompteRequest;
