@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
-@FeignClient(value = "service-compte", url = "http://localhost:8081", path="/api/compte") 
+@FeignClient(value = "service-compte", path="/api/compte") 
 public interface CompteFeignClient {
-    @GetMapping("/api/comptes/utilisateur/{id}")
-    public List<Compte> getComptesByUtilisateurId(@PathVariable("id") String id);
+    @GetMapping("/{id}")
+    public String getComptesByUtilisateurId(@PathVariable("id") String id);
 }
 
 
