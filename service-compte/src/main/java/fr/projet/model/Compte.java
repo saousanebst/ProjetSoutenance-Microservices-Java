@@ -33,7 +33,7 @@ public class Compte{
     @Column(nullable=false)
     private String passwordPlatform;
 
-
+    private String idUser;
 
 
     public String getId() {
@@ -98,6 +98,14 @@ public class Compte{
 
     public void setPasswordPlatform(String passwordPlatform) {
         this.passwordPlatform = passwordPlatform;
+    }
+
+    public String getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(String idUser) {
+        this.idUser = idUser;
     }
 
 
