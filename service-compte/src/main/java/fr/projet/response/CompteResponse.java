@@ -12,6 +12,7 @@ private LocalDate creationDate;
 private LocalDate updateDate;
 private String username;
 private String urlAdress;
+private String passwordPlatform;
 
 
 public String getId() {
@@ -55,6 +56,12 @@ public String getUrlAdress() {
 }
 public void setUrlAdress(String urlAdress) {
     this.urlAdress = urlAdress;
+}
+public String getPasswordPlatform() {
+    return passwordPlatform;
+}
+public void setPasswordPlatform(String passwordPlatform) {
+    this.passwordPlatform = passwordPlatform;
 }
      
 

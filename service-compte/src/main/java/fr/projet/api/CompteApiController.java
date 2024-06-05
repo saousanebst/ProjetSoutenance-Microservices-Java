@@ -55,25 +55,19 @@ private CompteSrv compteService;
 //findAllbyidfacultatifs
 
 
-    @PostMapping("/findByIds")
-    public List<CompteResponse> findAllById(@RequestBody List<String> ids) {
-        List<Compte> comptes = compteService.findAllByIds(ids);
-        List<CompteResponse> response = new ArrayList<>();
-
-        for (Compte compte : comptes) {
-            CompteResponse compteResponse = new CompteResponse();
-            BeanUtils.copyProperties(compte, compteResponse);
-            response.add(compteResponse);
-        }
-
-        return response;
+     @GetMapping("/{id}")
+    public CompteResponse findById(@PathVariable String id) {
+        Compte compte = compteService.findById(id);
+        CompteResponse compteResponse = new CompteResponse();
+        BeanUtils.copyProperties(compte, compteResponse);
+        return compteResponse;
     }
 
 
 
 //Create
 
-@PostMapping
+@PostMapping("/ajout")
     @ResponseStatus(HttpStatus.CREATED)
     public String create(@RequestBody CreateCompteRequest request) {
         Compte  compte= new Compte();
