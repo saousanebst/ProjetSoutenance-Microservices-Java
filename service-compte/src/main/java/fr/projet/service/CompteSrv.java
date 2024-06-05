@@ -43,9 +43,15 @@ public void deleteCompteById (String id){
 }
 
 
-//findAllByIds
+//findById
 
-public List<Compte> findAllByIds(List<String> ids) {
-        return compteRepository.findAllById(ids);
+public Compte findById(String id) {
+        Optional<Compte> compte = compteRepository.findById(id);
+        if (compte.isPresent()) {
+            return compte.get();
+        } else {
+            throw new RuntimeException("Compte not found with id " + id);
+        }
     }
+
 }
