@@ -1,11 +1,13 @@
 package fr.projet.api.dto;
 
+import java.time.LocalDate;
+
 public class InscriptionDTO {
     
 private String email;
 private String password;
 private String username;
-private String birthdate; 
+private LocalDate birthdate; 
 
 public InscriptionDTO() {
     super();
@@ -35,13 +37,14 @@ public void setUsername(String username) {
     this.username = username;
 }
 
-public String getBirthdate() {
+public LocalDate getBirthdate() {
     return birthdate;
 }
 
-public void setBirthdate(String birthdate) {
+public void setBirthdate(LocalDate birthdate) {
     this.birthdate = birthdate;
 }
+
 
 
 
