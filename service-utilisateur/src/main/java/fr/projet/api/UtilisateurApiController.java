@@ -17,16 +17,17 @@ import fr.projet.model.Utilisateur;
 import fr.projet.repository.UtilisateurRepository;
 import fr.projet.api.dto.ConnexionDTO;
 
+
 @RestController
 @RequestMapping("api/utilisateur")
 public class UtilisateurApiController {
 @Autowired 
  private UtilisateurRepository utilisateurRepository;
 
-    
+@Autowired
+private CompteFeignClient CompteFeignClient;
 
-
-
+   
 @PostMapping("/connexion")
 	public Utilisateur connexion(@RequestBody ConnexionDTO connexionDTO) {
 		Optional<Utilisateur> optUtilisateur = this.utilisateurRepository.findByEmailAndPassword(connexionDTO.getEmail(), connexionDTO.getPassword());
