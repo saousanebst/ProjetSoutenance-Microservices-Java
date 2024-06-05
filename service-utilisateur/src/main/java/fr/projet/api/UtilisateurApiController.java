@@ -19,6 +19,7 @@ import fr.projet.api.dto.InscriptionDTO;
 import fr.projet.feignClient.CompteFeignClient;
 import fr.projet.model.Utilisateur;
 import fr.projet.repository.UtilisateurRepository;
+import fr.projet.response.CompteResponse;
 import fr.projet.response.UtilisateurResponse;
 import fr.projet.api.dto.ConnexionDTO;
 
@@ -45,16 +46,16 @@ public List<UtilisateurResponse> findAll() {
 
         BeanUtils.copyProperties(utilisateur, utilisateurResponse);
 
-        String idCompte = this.compteFeignClient.getComptesByUtilisateurId(utilisateur.getId());
-        
-        if (idCompte != null) {
-            utilisateurResponse.setIdCompte(idCompte);
-        }
+         List<CompteResponse> comptes = compteFeignClient.getComptesByUtilisateurId(utilisateur.getId());
 
-        response.add(utilisateurResponse);
-    }
-    
-    return response;
+            if (comptes != null && !comptes.isEmpty()) {
+                utilisateurResponse.setComptes(comptes);
+            }
+
+            response.add(utilisateurResponse);
+        }
+        
+        return response;
 }
 
 
