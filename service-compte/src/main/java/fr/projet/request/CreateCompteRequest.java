@@ -1,23 +1,10 @@
-package fr.projet.model;
+package fr.projet.request;
 
 import java.time.LocalDate;
 
-import org.hibernate.annotations.UuidGenerator;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "compte")
-public class Compte{
-
-    @Id
-    @UuidGenerator
-    private String id;
-
-    @Column(nullable=false)
+public class CreateCompteRequest {
+    
     private String platformName;
 
     private String platformDescription;
@@ -29,73 +16,47 @@ public class Compte{
     private String username;
 
     private String urlAdress;
-
-    @Column(nullable=false)
     private String passwordPlatform;
 
-
-
-
-    public String getId() {
-        return this.id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getPlatformName() {
-        return this.platformName;
+        return platformName;
     }
-
     public void setPlatformName(String platformName) {
         this.platformName = platformName;
     }
-
     public String getPlatformDescription() {
-        return this.platformDescription;
+        return platformDescription;
     }
-
     public void setPlatformDescription(String platformDescription) {
         this.platformDescription = platformDescription;
     }
-
     public LocalDate getCreationDate() {
-        return this.creationDate;
+        return creationDate;
     }
-
     public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
-
     public LocalDate getUpdateDate() {
-        return this.updateDate;
+        return updateDate;
     }
-
     public void setUpdateDate(LocalDate updateDate) {
         this.updateDate = updateDate;
     }
-
     public String getUsername() {
-        return this.username;
+        return username;
     }
-
     public void setUsername(String username) {
         this.username = username;
     }
-
     public String getUrlAdress() {
-        return this.urlAdress;
+        return urlAdress;
     }
-
     public void setUrlAdress(String urlAdress) {
         this.urlAdress = urlAdress;
     }
-
     public String getPasswordPlatform() {
-        return this.passwordPlatform;
+        return passwordPlatform;
     }
-
     public void setPasswordPlatform(String passwordPlatform) {
         this.passwordPlatform = passwordPlatform;
     }
