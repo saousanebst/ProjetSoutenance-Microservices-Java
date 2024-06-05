@@ -1,7 +1,6 @@
 package fr.projet.service;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,9 +42,15 @@ public void deleteCompteById (String id){
 }
 
 
-//findAllByIds
+//findById
 
-public List<Compte> findAllByIds(List<String> ids) {
-        return compteRepository.findAllById(ids);
+public Compte findById(String id) {
+        Optional<Compte> compte = compteRepository.findById(id);
+        if (compte.isPresent()) {
+            return compte.get();
+        } else {
+            throw new RuntimeException("Compte not found with id " + id);
+        }
     }
+
 }
