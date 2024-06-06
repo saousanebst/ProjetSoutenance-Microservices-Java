@@ -14,7 +14,8 @@ import jakarta.persistence.Table;
 public class Utilisateur {
 @Id
 @UuidGenerator
-private String id ;
+private String id;
+
 @Column(nullable = false,unique = true)
 private String email;
 @Column(nullable = false)
@@ -25,6 +26,9 @@ private String username;
 private LocalDate birthdate;
 
 private String idCompte;
+
+
+
 
 public String getEmail() {
     return email;
@@ -50,19 +54,19 @@ public LocalDate getBirthdate() {
 public void setBirthdate(LocalDate birthdate) {
     this.birthdate = birthdate;
 }
-public String getId() {
-    return id;
-}
-public void setId(String id) {
-    this.id = id;
-}
+
 public String getIdCompte() {
     return idCompte;
 }
 public void setIdCompte(String idCompte) {
     this.idCompte = idCompte;
 }
-
+public String getId() {
+    return id;
+}
+public void setId(String id) {
+    this.id = id;
+}
 
 
 

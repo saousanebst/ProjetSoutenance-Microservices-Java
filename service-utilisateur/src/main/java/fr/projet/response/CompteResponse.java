@@ -2,14 +2,14 @@ package fr.projet.response;
 
 public class CompteResponse {
 
-private String idUser;
+private String id;
 
-public String getIdUser() {
-    return idUser;
+public String getId() {
+    return id;
 }
 
-public void setIdUser(String idUser) {
-    this.idUser = idUser;
+public void setIdUser(String id) {
+    this.id = id;
 } 
 
    
