@@ -1,6 +1,7 @@
 package fr.projet.response;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 @Component
@@ -16,19 +17,7 @@ private String username;
 
 private LocalDate birthdate;
 
-private String idCompte;
-
-
-
-
-
-public String getIdCompte() {
-    return idCompte;
-}
-
-public void setIdCompte(String idCompte) {
-    this.idCompte = idCompte;
-}
+private List<CompteResponse> comptes;
 
 public String getId() {
     return id;
@@ -68,6 +57,14 @@ public LocalDate getBirthdate() {
 
 public void setBirthdate(LocalDate birthdate) {
     this.birthdate = birthdate;
+}
+
+public List<CompteResponse> getComptes() {
+    return comptes;
+}
+
+public void setComptes(List<CompteResponse> comptes) {
+    this.comptes = comptes;
 }
 
 

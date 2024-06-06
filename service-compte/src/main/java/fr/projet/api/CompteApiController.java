@@ -53,8 +53,21 @@ private CompteSrv compteService;
         return response;
     }
 
-//findAllbyidfacultatifs
 
+ // findAll by userId
+    @GetMapping("/utilisateur/{idUser}")
+    public List<CompteResponse> getComptesByUtilisateurId(@PathVariable String idUser) {
+        List<Compte> comptes = compteRepository.findAllByIdUser(idUser);
+        List<CompteResponse> response = new ArrayList<>();
+
+        for (Compte compte : comptes) {
+            CompteResponse compteResponse = new CompteResponse();
+            BeanUtils.copyProperties(compte, compteResponse);
+            response.add(compteResponse);
+        }
+
+        return response;
+    }
 
      @GetMapping("/{id}")
     public CompteResponse findById(@PathVariable String id) {
