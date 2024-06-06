@@ -8,7 +8,7 @@ public String getId() {
     return id;
 }
 
-public void setIdUser(String id) {
+public void setId(String id) {
     this.id = id;
 } 
 
