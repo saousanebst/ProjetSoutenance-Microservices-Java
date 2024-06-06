@@ -48,12 +48,11 @@ public List<UtilisateurResponse> findAll() {
 
          List<CompteResponse> comptes = compteFeignClient.getComptesByUtilisateurId(utilisateur.getId());
 
-            if (comptes != null && !comptes.isEmpty()) {
-                utilisateurResponse.setComptes(comptes);
-            }
+        utilisateurResponse.setComptes(comptes);
+           
 
-            response.add(utilisateurResponse);
-        }
+           response.add(utilisateurResponse);
+         }
         
         return response;
 }
