@@ -7,7 +7,9 @@ import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +19,11 @@ import org.springframework.web.server.ResponseStatusException;
 import fr.projet.api.dto.ConnexionDTO;
 import fr.projet.api.dto.InscriptionDTO;
 import fr.projet.feignClient.CompteFeignClient;
+import fr.projet.feignClient.NoteFeignClient;
 import fr.projet.model.Utilisateur;
 import fr.projet.repository.UtilisateurRepository;
 import fr.projet.response.CompteResponse;
+import fr.projet.response.NoteResponse;
 import fr.projet.response.UtilisateurResponse;
 import fr.projet.api.dto.ConnexionDTO;
 
@@ -35,8 +39,10 @@ public class UtilisateurApiController {
 
 @Autowired
 private CompteFeignClient compteFeignClient;
+@Autowired
+private NoteFeignClient noteFeignClient;
 
-@GetMapping
+@GetMapping()
 public List<UtilisateurResponse> findAll() {
     List<Utilisateur> utilisateurs = this.utilisateurRepository.findAll();
     List<UtilisateurResponse> response = new ArrayList<>();
@@ -47,8 +53,10 @@ public List<UtilisateurResponse> findAll() {
         BeanUtils.copyProperties(utilisateur, utilisateurResponse);
 
          List<CompteResponse> comptes = compteFeignClient.getComptesByUtilisateurId(utilisateur.getId());
+        List<NoteResponse> notes = noteFeignClient.getNotesByUtilisateurId(utilisateur.getId());
 
         utilisateurResponse.setComptes(comptes);
+        utilisateurResponse.setNotes(notes);
            
 
            response.add(utilisateurResponse);
@@ -57,6 +65,26 @@ public List<UtilisateurResponse> findAll() {
         return response;
 }
 
+@GetMapping("/{id}")
+public ResponseEntity<UtilisateurResponse> findById(@PathVariable("id") String id) {
+    Optional<Utilisateur> utilisateurOptional = this.utilisateurRepository.findById(id);
+
+    if (utilisateurOptional.isPresent()) {
+        Utilisateur utilisateur = utilisateurOptional.get();
+        UtilisateurResponse utilisateurResponse = new UtilisateurResponse();
+        BeanUtils.copyProperties(utilisateur, utilisateurResponse);
+
+        List<CompteResponse> comptes = compteFeignClient.getComptesByUtilisateurId(utilisateur.getId());
+        List<NoteResponse> notes = noteFeignClient.getNotesByUtilisateurId(utilisateur.getId());
+
+        utilisateurResponse.setComptes(comptes);
+        utilisateurResponse.setNotes(notes);
+
+        return ResponseEntity.ok(utilisateurResponse);
+    } else {
+        return ResponseEntity.notFound().build();
+    }
+}
 
 
 
