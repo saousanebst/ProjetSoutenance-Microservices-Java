@@ -19,6 +19,12 @@ private LocalDate birthdate;
 
 private List<CompteResponse> comptes;
 
+private List<NoteResponse> notes;
+
+
+
+
+
 public String getId() {
     return id;
 }
@@ -65,6 +71,14 @@ public List<CompteResponse> getComptes() {
 
 public void setComptes(List<CompteResponse> comptes) {
     this.comptes = comptes;
+}
+
+public List<NoteResponse> getNotes() {
+    return notes;
+}
+
+public void setNotes(List<NoteResponse> notes) {
+    this.notes = notes;
 }
 
 

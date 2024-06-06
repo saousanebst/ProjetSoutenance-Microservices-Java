@@ -15,7 +15,6 @@ public class Utilisateur {
 @Id
 @UuidGenerator
 private String id;
-
 @Column(nullable = false,unique = true)
 private String email;
 @Column(nullable = false)
@@ -26,10 +25,6 @@ private String username;
 private LocalDate birthdate;
 
 private String idCompte;
-
-
-
-
 public String getEmail() {
     return email;
 }
