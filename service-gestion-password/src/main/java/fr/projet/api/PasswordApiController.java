@@ -1,5 +1,6 @@
 package fr.projet.api;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
@@ -17,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.projet.OpenFeignClient.UserFeignClient;
 import fr.projet.Request.CreatePasswordRequest;
 import fr.projet.Response.PasswordResponse;
+import fr.projet.Response.PasswordResponseId;
+import fr.projet.Response.UtilisateurResponse;
 import fr.projet.model.Password;
 import fr.projet.repository.PasswordRepository;
 import fr.projet.service.PasswordService;
@@ -34,6 +38,9 @@ private PasswordService passwordSrv;
 
 @Autowired
 private PasswordRepository passwordRepository;
+
+@Autowired
+private UserFeignClient userFeignClient;
 
 
 
@@ -62,6 +69,17 @@ private PasswordRepository passwordRepository;
 		password.setId(id);
 		return passwordSrv.update(password);
 	}
+
+    // @PutMapping("/{userId}/password")
+    // public ResponseEntity<PasswordResponse> updatePassword(@PathVariable String id, @RequestBody Password password) {
+    //     password.setId(id);
+    //     Password updatedPassword = passwordSrv.update(password);
+        
+    //     PasswordResponse response = new PasswordResponse();
+    //     BeanUtils.copyProperties(updatedPassword, response);
+        
+    //     return ResponseEntity.ok(response);}
+    
 	
    
 
@@ -96,5 +114,33 @@ private PasswordRepository passwordRepository;
     }
 
 
+    // @GetMapping("/{id}")
+    // public ResponseEntity<PasswordResponse> findById(@PathVariable("id") String id) {
+    //     Optional<Password> passwordOptional = this.passwordRepository.findById(id);
+    
+    //     if (passwordOptional.isPresent()) {
+    //         Password password = passwordOptional.get();
+    //         PasswordResponse passwordResponse = new PasswordResponse();
+    //         BeanUtils.copyProperties(password, passwordResponse);
+    
+    //         // Assurez-vous que la méthode getUserByPasswordId retourne un UtilisateurResponse
+    //         UtilisateurResponse utilisateurResponse = userFeignClient.getUserByIdPassword(password);
+    
+    //         // Copier les propriétés utilisateur dans le PasswordResponse
+    //         if (utilisateurResponse != null) {
+    //             passwordResponse.setUserId(utilisateurResponse.getId());
+                
+    //             // Ajouter d'autres propriétés utilisateur si nécessaire
+    //         }
+    
+    //         return ResponseEntity.ok(passwordResponse);
+    //     } else {
+    //         return ResponseEntity.notFound().build();
+    //     }
+    // }
+
+
+
+    
 
 }

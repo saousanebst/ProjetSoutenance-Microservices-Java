@@ -9,8 +9,8 @@ public class PasswordResponse {
     private String platformName;
     private String username;
     private String passwordValue;
-    // private LocalDateTime dateAjout;
-    // private LocalDateTime dateModif;
+    //private LocalDateTime dateAjout;
+    private LocalDateTime dateModif;
 
 
    
@@ -44,12 +44,12 @@ public class PasswordResponse {
     // public void setDateAjout(LocalDateTime dateAjout) {
     //     this.dateAjout = dateAjout;
     // }
-    // public LocalDateTime getDateModif() {
-    //     return dateModif;
-    // }
-    // public void setDateModif(LocalDateTime dateModif) {
-    //     this.dateModif = dateModif;
-    // }
+    public LocalDateTime getDateModif() {
+        return dateModif;
+    }
+    public void setDateModif(LocalDateTime dateModif) {
+        this.dateModif = dateModif;
+    }
 
     
 }
