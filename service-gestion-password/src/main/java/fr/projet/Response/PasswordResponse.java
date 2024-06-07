@@ -4,19 +4,16 @@ import java.time.LocalDateTime;
 
 public class PasswordResponse {
     
-     private String id;
+   
     private String userId;
     private String platformName;
     private String username;
     private String passwordValue;
-    private LocalDateTime dateAjout;
+    //private LocalDateTime dateAjout;
     private LocalDateTime dateModif;
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
+
+
+   
     public String getUserId() {
         return userId;
     }
@@ -41,12 +38,12 @@ public class PasswordResponse {
     public void setPasswordValue(String passwordValue) {
         this.passwordValue = passwordValue;
     }
-    public LocalDateTime getDateAjout() {
-        return dateAjout;
-    }
-    public void setDateAjout(LocalDateTime dateAjout) {
-        this.dateAjout = dateAjout;
-    }
+    // public LocalDateTime getDateAjout() {
+    //     return dateAjout;
+    // }
+    // public void setDateAjout(LocalDateTime dateAjout) {
+    //     this.dateAjout = dateAjout;
+    // }
     public LocalDateTime getDateModif() {
         return dateModif;
     }
