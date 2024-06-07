@@ -1,10 +1,13 @@
 package fr.projet.api;
 
+import java.util.Optional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.projet.Request.CreatePasswordRequest;
+import fr.projet.Response.PasswordResponse;
 import fr.projet.model.Password;
 import fr.projet.repository.PasswordRepository;
 import fr.projet.service.PasswordService;
@@ -48,6 +52,8 @@ private PasswordRepository passwordRepository;
         return password.getId();
     }
 
+
+
 //update 
 
 @PutMapping("/{id}")
@@ -76,11 +82,18 @@ private PasswordRepository passwordRepository;
     }
 
 
-
-
-
-
-
+    @GetMapping("/{id}")
+    public ResponseEntity<PasswordResponse> getPasswordById(@PathVariable String id) {
+        Optional<Password> optionalPassword = passwordRepository.findById(id);
+        if (optionalPassword.isPresent()) {
+            Password password = optionalPassword.get();
+            PasswordResponse response = new PasswordResponse();
+            BeanUtils.copyProperties(password, response);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 
 
 

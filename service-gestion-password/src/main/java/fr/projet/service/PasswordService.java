@@ -28,6 +28,14 @@ private UserFeignClient userFeignClient; // Utilisation d'un client Feign pour o
 @Autowired
 private PasswordResetTokenRepository passwordResetTokenRepository;
 
+
+
+ // obtenir un mot de passe par ID
+ public Password getPasswordById(String id) {
+    Optional<Password> optionalPassword = passwordRepository.findById(id);
+    return optionalPassword.orElse(null);
+}
+
 //create password
 
     public Password createPassword(Password password) {
@@ -46,8 +54,9 @@ private PasswordResetTokenRepository passwordResetTokenRepository;
         Optional<Password> Password =  passwordRepository.findById(password.getId());
         if (Password.isPresent()) {
             Password updatedPassword = Password.get();
-            updatedPassword.setDateModif(null);
-            updatedPassword.setDateAjout(null);
+            updatedPassword.setPasswordValue(password.getPasswordValue());
+            updatedPassword.setDateModif(password.getDateModif());
+            updatedPassword.setDateAjout(password.getDateAjout());
             return  passwordRepository.save(updatedPassword);
         } else {
             throw new RuntimeException("Note not found with id " + password.getId());
