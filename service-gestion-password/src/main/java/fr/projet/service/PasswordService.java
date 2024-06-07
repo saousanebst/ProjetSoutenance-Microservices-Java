@@ -53,6 +53,7 @@ private PasswordResetTokenRepository passwordResetTokenRepository;
         Optional<Password> Password =  passwordRepository.findById(password.getId());
         if (Password.isPresent()) {
             Password updatedPassword = Password.get();
+            updatedPassword.setIdUser(password.getIdUser());
             updatedPassword.setPasswordValue(password.getPasswordValue());
             updatedPassword.setDateModif(LocalDateTime.now());
             
