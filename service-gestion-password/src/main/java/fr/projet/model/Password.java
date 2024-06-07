@@ -1,5 +1,8 @@
 package fr.projet.model;
 
+
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Entity;
@@ -15,6 +18,10 @@ private String Id;
 
 private String idUser;
 
+private LocalDateTime DateAjout;
+
+private LocalDateTime DateModif;
+
 public String getId() {
     return Id;
 }
@@ -29,6 +36,22 @@ public String getIdUser() {
 
 public void setIdUser(String idUser) {
     this.idUser = idUser;
+}
+
+public LocalDateTime getDateAjout() {
+    return DateAjout;
+}
+
+public void setDateAjout(LocalDateTime dateAjout) {
+    DateAjout = dateAjout;
+}
+
+public LocalDateTime getDateModif() {
+    return DateModif;
+}
+
+public void setDateModif(LocalDateTime dateModif) {
+    DateModif = dateModif;
 }
 
 
