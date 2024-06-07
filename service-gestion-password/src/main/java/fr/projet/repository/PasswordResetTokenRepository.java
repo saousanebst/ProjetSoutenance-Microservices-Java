@@ -4,9 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-
-
-import fr.projet.service.PasswordResetToken;
+import fr.projet.model.PasswordResetToken;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, String>{
 
