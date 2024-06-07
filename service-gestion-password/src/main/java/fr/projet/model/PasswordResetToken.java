@@ -1,13 +1,21 @@
-package fr.projet.service;
+package fr.projet.model;
 
 import java.time.LocalDateTime;
 
-public class PasswordResetToken {
+import org.hibernate.annotations.UuidGenerator;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+@Entity
+@Table
+public class PasswordResetToken {
+    @Id
+    @UuidGenerator
+private String id;
      private String token;
     private String email;
     private LocalDateTime expiryDate;
-
 
     public PasswordResetToken(String token, String email) {
         this.token = token;

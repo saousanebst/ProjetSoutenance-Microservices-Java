@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import fr.projet.OpenFeignClient.UserFeignClient;
 import fr.projet.Response.UtilisateurResponse;
 import fr.projet.model.Password;
+import fr.projet.model.PasswordResetToken;
 import fr.projet.repository.PasswordRepository;
 import fr.projet.repository.PasswordResetTokenRepository;
 import org.springframework.security.crypto.bcrypt.BCrypt;
