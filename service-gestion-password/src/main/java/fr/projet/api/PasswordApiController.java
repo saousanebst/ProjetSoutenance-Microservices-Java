@@ -63,7 +63,7 @@ private PasswordRepository passwordRepository;
 		return passwordSrv.update(password);
 	}
 	
-
+   
 
     // Endpoint pour demander une réinitialisation de mot de passe
     @PostMapping("/request-reset")

@@ -22,9 +22,9 @@ public class CreatePasswordRequest {
     private String passwordValue;
 
   
-    private LocalDateTime dateAjout;
+    // private LocalDateTime dateAjout;
 
-    private LocalDateTime dateModif;
+    // private LocalDateTime dateModif;
 
 
    
@@ -59,24 +59,24 @@ public class CreatePasswordRequest {
     }
 
 
-    public LocalDateTime getDateAjout() {
-        return dateAjout;
-    }
+    // public LocalDateTime getDateAjout() {
+    //     return dateAjout;
+    // }
 
 
-    public void setDateAjout(LocalDateTime dateAjout) {
-        this.dateAjout = dateAjout;
-    }
+    // public void setDateAjout(LocalDateTime dateAjout) {
+    //     this.dateAjout = dateAjout;
+    // }
 
 
-    public LocalDateTime getDateModif() {
-        return dateModif;
-    }
+    // public LocalDateTime getDateModif() {
+    //     return dateModif;
+    // }
 
 
-    public void setDateModif(LocalDateTime dateModif) {
-        this.dateModif = dateModif;
-    }
+    // public void setDateModif(LocalDateTime dateModif) {
+    //     this.dateModif = dateModif;
+    // }
 
 
    

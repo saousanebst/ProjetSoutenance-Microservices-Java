@@ -40,7 +40,6 @@ private PasswordResetTokenRepository passwordResetTokenRepository;
 
     public Password createPassword(Password password) {
         password.setDateAjout(LocalDateTime.now());
-        password.setDateModif(LocalDateTime.now());
         this.passwordRepository.save(password);
 
         return password;
@@ -55,8 +54,8 @@ private PasswordResetTokenRepository passwordResetTokenRepository;
         if (Password.isPresent()) {
             Password updatedPassword = Password.get();
             updatedPassword.setPasswordValue(password.getPasswordValue());
-            updatedPassword.setDateModif(password.getDateModif());
-            updatedPassword.setDateAjout(password.getDateAjout());
+            updatedPassword.setDateModif(LocalDateTime.now());
+            
             return  passwordRepository.save(updatedPassword);
         } else {
             throw new RuntimeException("Note not found with id " + password.getId());
