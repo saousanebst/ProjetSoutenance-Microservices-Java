@@ -7,9 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 public class CreatePasswordRequest {
 
 
-    // @NotBlank
-    // private String userId;
-
+   
   
     @NotBlank
     private String platformName;

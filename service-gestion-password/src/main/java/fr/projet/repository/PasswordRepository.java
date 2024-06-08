@@ -8,7 +8,7 @@ import fr.projet.model.Password;
 
 public interface PasswordRepository extends JpaRepository<Password, String> {
     
-   public  Password findByUserId(String userId);
+   public  Password findByidUser(String idUser);
 }
 
 
