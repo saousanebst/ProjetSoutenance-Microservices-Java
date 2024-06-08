@@ -16,7 +16,7 @@ public class Password {
 @UuidGenerator
 private String Id;
 
-private String idUser;
+private String userId;
 
 private String passwordValue;
 
@@ -32,13 +32,7 @@ public void setId(String id) {
     Id = id;
 }
 
-public String getIdUser() {
-    return idUser;
-}
 
-public void setIdUser(String idUser) {
-    this.idUser = idUser;
-}
 
 public LocalDateTime getDateAjout() {
     return DateAjout;
@@ -62,6 +56,14 @@ public String getPasswordValue() {
 
 public void setPasswordValue(String passwordValue) {
     this.passwordValue = passwordValue;
+}
+
+public String getUserId() {
+    return userId;
+}
+
+public void setUserId(String userId) {
+    this.userId = userId;
 }
 
 

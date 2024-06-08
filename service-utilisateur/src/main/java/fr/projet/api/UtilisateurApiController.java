@@ -20,10 +20,12 @@ import fr.projet.api.dto.ConnexionDTO;
 import fr.projet.api.dto.InscriptionDTO;
 import fr.projet.feignClient.CompteFeignClient;
 import fr.projet.feignClient.NoteFeignClient;
+import fr.projet.feignClient.PaaswordFeignClient;
 import fr.projet.model.Utilisateur;
 import fr.projet.repository.UtilisateurRepository;
 import fr.projet.response.CompteResponse;
 import fr.projet.response.NoteResponse;
+import fr.projet.response.PasswordResponse;
 import fr.projet.response.UtilisateurResponse;
 import fr.projet.api.dto.ConnexionDTO;
 
@@ -41,6 +43,8 @@ public class UtilisateurApiController {
 private CompteFeignClient compteFeignClient;
 @Autowired
 private NoteFeignClient noteFeignClient;
+@Autowired
+private PaaswordFeignClient paaswordFeignClient ;
 
 @GetMapping()
 public List<UtilisateurResponse> findAll() {
@@ -76,9 +80,10 @@ public ResponseEntity<UtilisateurResponse> findById(@PathVariable("id") String i
 
         List<CompteResponse> comptes = compteFeignClient.getComptesByUtilisateurId(utilisateur.getId());
         List<NoteResponse> notes = noteFeignClient.getNotesByUtilisateurId(utilisateur.getId());
-
+        String password = paaswordFeignClient.getPasswordByUserId(utilisateur.getId());
         utilisateurResponse.setComptes(comptes);
         utilisateurResponse.setNotes(notes);
+        utilisateurResponse.setPassword(password);
 
         return ResponseEntity.ok(utilisateurResponse);
     } else {
