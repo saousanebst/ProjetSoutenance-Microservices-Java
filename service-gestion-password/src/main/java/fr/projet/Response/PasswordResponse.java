@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class PasswordResponse {
     
    
-    private String userId;
+    private String idUser;
     private String platformName;
     private String username;
     private String passwordValue;
@@ -14,12 +14,6 @@ public class PasswordResponse {
 
 
    
-    public String getUserId() {
-        return userId;
-    }
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
     public String getPlatformName() {
         return platformName;
     }
@@ -49,6 +43,12 @@ public class PasswordResponse {
     }
     public void setDateModif(LocalDateTime dateModif) {
         this.dateModif = dateModif;
+    }
+    public String getIdUser() {
+        return idUser;
+    }
+    public void setIdUser(String idUser) {
+        this.idUser = idUser;
     }
 
     

@@ -24,7 +24,7 @@ private String username;
 @Column(nullable = false)
 private LocalDate birthdate;
 
-private String idCompte;
+
 public String getEmail() {
     return email;
 }
@@ -50,12 +50,7 @@ public void setBirthdate(LocalDate birthdate) {
     this.birthdate = birthdate;
 }
 
-public String getIdCompte() {
-    return idCompte;
-}
-public void setIdCompte(String idCompte) {
-    this.idCompte = idCompte;
-}
+
 public String getId() {
     return id;
 }
