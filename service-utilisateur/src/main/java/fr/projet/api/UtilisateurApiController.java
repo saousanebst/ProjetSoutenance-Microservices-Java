@@ -103,18 +103,11 @@ public ResponseEntity<UtilisateurResponse> findById(@PathVariable("id") String i
 
         logger.info("User details before saving: " + utilisateur.toString());
 
+        utilisateur.setPassword(password);
         utilisateurRepository.save(utilisateur);
         logger.info("User details after saving: " + utilisateur.toString());
 
     
-     utilisateurResponse.setComptes(comptes);
-        utilisateurResponse.setNotes(notes);
-        utilisateurResponse.setPasswordValue(password);
-
-
- 
-// Préparer la réponse
-
 
 return ResponseEntity.ok(utilisateurResponse);
 } else {
