@@ -9,6 +9,8 @@ import fr.projet.model.Password;
 public interface PasswordRepository extends JpaRepository<Password, String> {
     
    public  Password findByidUser(String idUser);
+
+   
 }
 
 
