@@ -17,6 +17,8 @@ private String id;
     private String email;
     private LocalDateTime expiryDate;
 
+    public PasswordResetToken(){ }
+
     public PasswordResetToken(String token, String email) {
         this.token = token;
         this.email = email;
