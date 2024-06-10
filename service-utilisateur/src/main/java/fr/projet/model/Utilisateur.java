@@ -18,7 +18,7 @@ private String id;
 @Column(nullable = false,unique = true)
 private String email;
 @Column(nullable = false)
-private String password;
+private String passwordValue;
 @Column(nullable = false)
 private String username;
 @Column(nullable = false)
@@ -32,10 +32,10 @@ public void setEmail(String email) {
     this.email = email;
 }
 public String getPassword() {
-    return password;
+    return passwordValue;
 }
 public void setPassword(String password) {
-    this.password = password;
+    this.passwordValue = password;
 }
 public String getUsername() {
     return username;

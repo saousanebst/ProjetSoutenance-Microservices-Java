@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,7 +24,7 @@ import fr.projet.api.dto.ConnexionDTO;
 import fr.projet.api.dto.InscriptionDTO;
 import fr.projet.feignClient.CompteFeignClient;
 import fr.projet.feignClient.NoteFeignClient;
-import fr.projet.feignClient.PaaswordFeignClient;
+import fr.projet.feignClient.PasswordFeignClient;
 import fr.projet.model.Utilisateur;
 import fr.projet.repository.UtilisateurRepository;
 import fr.projet.response.CompteResponse;
@@ -34,6 +38,10 @@ import fr.projet.api.dto.ConnexionDTO;
 @RequestMapping("api/utilisateur")
 public class UtilisateurApiController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UtilisateurApiController.class);
+
+
+
 @Autowired 
  private UtilisateurRepository utilisateurRepository;
  @Autowired
@@ -44,7 +52,9 @@ private CompteFeignClient compteFeignClient;
 @Autowired
 private NoteFeignClient noteFeignClient;
 @Autowired
-private PaaswordFeignClient paaswordFeignClient ;
+private PasswordFeignClient passwordFeignClient;
+
+
 
 @GetMapping()
 public List<UtilisateurResponse> findAll() {
@@ -76,26 +86,48 @@ public ResponseEntity<UtilisateurResponse> findById(@PathVariable("id") String i
     if (utilisateurOptional.isPresent()) {
         Utilisateur utilisateur = utilisateurOptional.get();
         UtilisateurResponse utilisateurResponse = new UtilisateurResponse();
-        BeanUtils.copyProperties(utilisateur, utilisateurResponse);
+       BeanUtils.copyProperties(utilisateur, utilisateurResponse);
 
         List<CompteResponse> comptes = compteFeignClient.getComptesByUtilisateurId(utilisateur.getId());
         List<NoteResponse> notes = noteFeignClient.getNotesByUtilisateurId(utilisateur.getId());
-        String password = paaswordFeignClient.getPasswordByUserId(utilisateur.getId());
+
+        logger.info("Fetching password for user ID: " + utilisateur.getId());
+
+        String password = passwordFeignClient.getPasswordByUserId(utilisateur.getId());
+
         utilisateurResponse.setComptes(comptes);
         utilisateurResponse.setNotes(notes);
-        utilisateurResponse.setPassword(password);
+        logger.info("Retrieved password: " + password);
 
-        return ResponseEntity.ok(utilisateurResponse);
-    } else {
-        return ResponseEntity.notFound().build();
-    }
+        utilisateurResponse.setPasswordValue(password);
+
+        logger.info("User details before saving: " + utilisateur.toString());
+
+        utilisateurRepository.save(utilisateur);
+        logger.info("User details after saving: " + utilisateur.toString());
+
+    
+     utilisateurResponse.setComptes(comptes);
+        utilisateurResponse.setNotes(notes);
+        utilisateurResponse.setPasswordValue(password);
+
+
+ 
+// Préparer la réponse
+
+
+return ResponseEntity.ok(utilisateurResponse);
+} else {
+return ResponseEntity.notFound().build();
+
+}
 }
 
 
 
 @PostMapping("/connexion")
 	public Utilisateur connexion(@RequestBody ConnexionDTO connexionDTO) {
-		Optional<Utilisateur> optUtilisateur = this.utilisateurRepository.findByEmailAndPassword(connexionDTO.getEmail(), connexionDTO.getPassword());
+		Optional<Utilisateur> optUtilisateur = this.utilisateurRepository.findByEmailAndPasswordValue(connexionDTO.getEmail(), connexionDTO.getPasswordValue());
 		
 		if(optUtilisateur.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -115,6 +147,20 @@ public ResponseEntity<UtilisateurResponse> findById(@PathVariable("id") String i
 
 		return utilisateur;
 	}
+
+//reset
+
+ @PostMapping("/request-reset")
+ public ResponseEntity<String> requestPasswordReset(@RequestParam String email) {
+     passwordFeignClient.requestPasswordReset(email);
+     return ResponseEntity.ok("Password reset email has been sent.");
+ }
+
+ @PostMapping("/reset")
+ public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+     passwordFeignClient.resetPassword(token, newPassword);
+     return ResponseEntity.ok("Password has been reset.");
+ }
 
 
 

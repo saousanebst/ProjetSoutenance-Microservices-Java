@@ -11,7 +11,7 @@ private String id ;
 
 private String email;
 
-private String password;
+private String passwordValue;
 
 private String username;
 
@@ -41,13 +41,6 @@ public void setEmail(String email) {
     this.email = email;
 }
 
-public String getPassword() {
-    return password;
-}
-
-public void setPassword(String password) {
-    this.password = password;
-}
 
 public String getUsername() {
     return username;
@@ -79,6 +72,14 @@ public List<NoteResponse> getNotes() {
 
 public void setNotes(List<NoteResponse> notes) {
     this.notes = notes;
+}
+
+public String getPasswordValue() {
+    return passwordValue;
+}
+
+public void setPasswordValue(String passwordValue) {
+    this.passwordValue = passwordValue;
 }
 
 
