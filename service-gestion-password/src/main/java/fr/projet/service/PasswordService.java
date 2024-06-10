@@ -42,17 +42,19 @@ private PasswordResetTokenRepository passwordResetTokenRepository;
 
 //update 
 
-  public Password update(Password password) {
-        Optional<Password> Password =  passwordRepository.findById(password.getId());
-        if (Password.isPresent()) {
-            Password updatedPassword = Password.get();
-            updatedPassword.setIdUser(password.getIdUser());
-            updatedPassword.setPasswordValue(password.getPasswordValue());
-            updatedPassword.setDateModif(LocalDateTime.now());
+ 
+
+    public void updatePassword(String idUser, String newPassword) {
+        Optional<Password> optionalPassword = passwordRepository.findById(idUser);
+        if (optionalPassword.isPresent()) {
+            Password password = optionalPassword.get();
+            password.setPasswordValue(hashPassword(newPassword));
+            password.setDateModif(LocalDateTime.now());
+            passwordRepository.save(password);
+
             
-            return  passwordRepository.save(updatedPassword);
         } else {
-            throw new RuntimeException("Note not found with id " + password.getId());
+            throw new RuntimeException("User not found");
         }
     }
 

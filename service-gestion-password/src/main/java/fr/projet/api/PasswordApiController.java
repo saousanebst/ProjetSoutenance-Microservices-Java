@@ -59,12 +59,11 @@ private PasswordRepository passwordRepository;
 
 //update 
 
-@PutMapping("/{id}")
-	public Password updatePassword (@PathVariable String id,@RequestBody Password passwordValue) 
-	{
-		passwordValue.setId(id);
-		return passwordSrv.update(passwordValue);
-	}
+@PutMapping("/utilisateur/update")
+public ResponseEntity<Void> updatePassword(@RequestParam("idUser") String idUser, @RequestParam("newPassword") String newPassword) {
+    passwordSrv.updatePassword(idUser, newPassword);
+    return ResponseEntity.noContent().build();
+}
 
 
  // findAll by userId
