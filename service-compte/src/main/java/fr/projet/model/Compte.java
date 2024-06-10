@@ -31,6 +31,7 @@ public class Compte{
     private String urlAdress;
 
     @Column(nullable=false)
+    
     private String passwordPlatform;
 
     private String idUser;

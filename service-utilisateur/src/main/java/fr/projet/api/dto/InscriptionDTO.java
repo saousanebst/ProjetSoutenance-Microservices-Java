@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class InscriptionDTO {
     
 private String email;
-private String password;
+private String passwordValue;
 private String username;
 private LocalDate birthdate; 
 
@@ -22,11 +22,17 @@ public void setEmail(String email) {
 }
 
 public String getPassword() {
-    return password;
+    return passwordValue;
 }
 
-public void setPassword(String password) {
-    this.password = password;
+
+
+public String getPasswordValue() {
+    return passwordValue;
+}
+
+public void setPasswordValue(String passwordValue) {
+    this.passwordValue = passwordValue;
 }
 
 public String getUsername() {

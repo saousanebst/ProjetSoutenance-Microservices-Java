@@ -8,5 +8,7 @@ import fr.projet.model.Utilisateur;
 
 public interface UtilisateurRepository extends JpaRepository<Utilisateur,String > {
 
-     Optional<Utilisateur> findByEmailAndPassword(String email, String password);
+     Optional<Utilisateur> findByEmailAndPasswordValue(String email, String passwordValue);
+
+      Optional<Utilisateur> findByEmail(String email);
 } 

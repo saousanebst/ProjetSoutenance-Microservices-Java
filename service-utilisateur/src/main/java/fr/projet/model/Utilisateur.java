@@ -18,13 +18,13 @@ private String id;
 @Column(nullable = false,unique = true)
 private String email;
 @Column(nullable = false)
-private String password;
+private String passwordValue;
 @Column(nullable = false)
 private String username;
 @Column(nullable = false)
 private LocalDate birthdate;
 
-private String idCompte;
+
 public String getEmail() {
     return email;
 }
@@ -32,10 +32,10 @@ public void setEmail(String email) {
     this.email = email;
 }
 public String getPassword() {
-    return password;
+    return passwordValue;
 }
 public void setPassword(String password) {
-    this.password = password;
+    this.passwordValue = password;
 }
 public String getUsername() {
     return username;
@@ -50,12 +50,7 @@ public void setBirthdate(LocalDate birthdate) {
     this.birthdate = birthdate;
 }
 
-public String getIdCompte() {
-    return idCompte;
-}
-public void setIdCompte(String idCompte) {
-    this.idCompte = idCompte;
-}
+
 public String getId() {
     return id;
 }
