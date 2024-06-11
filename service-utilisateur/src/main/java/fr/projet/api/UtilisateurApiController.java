@@ -156,16 +156,28 @@ return ResponseEntity.notFound().build();
      passwordFeignClient.resetPassword(token, newPassword);
      return ResponseEntity.ok("Password has been reset.");
  }
-@PutMapping("/update")
-    public ResponseEntity<Void> updatePassword(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword) {
+// @PutMapping("/update")
+//     public ResponseEntity<Void> updatePassword(@RequestParam("id") String idUser, @RequestParam("newPassword") String newPassword) {
        
-        passwordFeignClient.updatePassword(id, newPassword);
+//         passwordFeignClient.updatePassword(idUser, newPassword);
 
-        return ResponseEntity.noContent().build();
+//         return ResponseEntity.noContent().build();
+//     }
+
+@PutMapping("/update")
+public void updatePassword(String idUser, String newPassword) {
+    Optional<Utilisateur> optionalUser = utilisateurRepository.findById(idUser);
+    if (optionalUser.isPresent()) {
+        Utilisateur user = optionalUser.get();
+        user.setPassword(newPassword);
+        utilisateurRepository.save(user);
+
+        // Met à jour le mot de passe dans le service Password
+        //passwordFeignClient.resetPassword(userId, newPassword);
+    } else {
+        throw new RuntimeException("User not found");
     }
-
-
-
+}
 
 
 
