@@ -2,13 +2,20 @@ package fr.projet.service;
 
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import fr.projet.Request.PasswordCheckRequest;
+import fr.projet.Response.PasswordCheckResponse;
+import fr.projet.Response.PasswordGeneratedResponse;
 import fr.projet.model.Password;
 import fr.projet.model.PasswordResetToken;
 import fr.projet.repository.PasswordRepository;
@@ -70,44 +77,6 @@ private PasswordResetTokenRepository passwordResetTokenRepository;
 
 
 
-
-
-// Injectez les dépendances nécessaires, par exemple un référentiel de mots de passe compromis
-
-    // public PasswordCheckResponse checkPassword(PasswordCheckRequest request) {
-    //     // Logique de vérification du mot de passe
-    //     boolean isVulnerable = checkPasswordVulnerability(request.getPassword());
-    //     String message = isVulnerable ? "Password is vulnerable" : "Password is safe";
-    //     return new PasswordCheckResponse(isVulnerable, message);
-    // }
-
-    // public PasswordGenerateResponse generatePassword() {
-    //     // Logique de génération de mot de passe
-    //     String generatedPassword = generateStrongPassword();
-    //     String strength = evaluatePasswordStrength(generatedPassword);
-    //     return new PasswordGenerateResponse(generatedPassword, strength);
-    // }
-
-    // private boolean checkPasswordVulnerability(String password) {
-    //     // Logique pour vérifier si le mot de passe est compromis
-    //     // Par exemple, comparer le hash du mot de passe avec une base de données de mots de passe compromis
-    //     return false; // Modifier selon la logique réelle
-    // }
-
-    // private String generateStrongPassword() {
-    //     // Logique pour générer un mot de passe fort
-    //     return "GeneratedPassword123!";
-    // }
-
-    // private String evaluatePasswordStrength(String password) {
-    //     // Logique pour évaluer la force du mot de passe
- 
- 
-    //     return "Strong";
-    // }
-
-
-
 //reset request 
     public void requestPasswordReset(String email) {
         // Logique pour demander la réinitialisation du mot de passe
@@ -147,10 +116,115 @@ private PasswordResetTokenRepository passwordResetTokenRepository;
         }
 
 
+//check 
 
+public PasswordCheckResponse checkPasswordStrength(PasswordCheckRequest request) {
 
+    if (request == null) {
+        return new PasswordCheckResponse(false, false, "Password cannot be null");
+    }
 
+    boolean isStrong = isStrongPassword(request.getPasswordPlatform());
+    String message = isStrong ? "Password is strong" : "Password is weak";
+    return new PasswordCheckResponse(isStrong, false, message);
 }
 
+    // Méthode pour vérifier si un mot de passe est fort
+    private boolean isStrongPassword(String password) {
+        // Définir les critères de validation
+    int minLength = 12;
+    boolean hasUppercase = false;
+    boolean hasLowercase = false;
+    boolean hasDigit = false;
+    boolean hasSpecialChar = false;
+    String specialChars = "!@#$%^&*()-+";
+    
+    if (password.length() < minLength) {
+        return false;
+    }
+    
+    for (char c : password.toCharArray()) {
+        if (Character.isUpperCase(c)) {
+            hasUppercase = true;
+        } else if (Character.isLowerCase(c)) {
+            hasLowercase = true;
+        } else if (Character.isDigit(c)) {
+            hasDigit = true;
+        } else if (specialChars.indexOf(c) != -1) {
+            hasSpecialChar = true;
+        }
+    }
+    
+    return hasUppercase && hasLowercase && hasDigit && hasSpecialChar;
+}
+
+       
+//vulnérabilité
+
+ // Vérifier la vulnérabilité d'un mot de passe
+
+
+// Méthode pour vérifier si un mot de passe est vulnérable
+public PasswordCheckResponse checkPasswordVulnerability(PasswordCheckRequest request) {
+    boolean isVulnerable = isPasswordVulnerable(request.getPasswordPlatform());
+    String message = isVulnerable ? "Password is vulnerable" : "Password is not found in the list of stolen passwords";
+    return new PasswordCheckResponse(false, isVulnerable, message);
+}
+
+  // Méthode pour vérifier si un mot de passe est vulnérable
+  private boolean isPasswordVulnerable(String password) {
+    String passwordHash = DigestUtils.sha1Hex(password);
+    // Comparer le hash du mot de passe avec les hashes stockés dans les fichiers
+    return false;
+}
+
+ // Générer un mot de passe fort
+ public PasswordGeneratedResponse generatePassword() {
+    String generatedPassword = generateStrongPassword();
+    return new PasswordGeneratedResponse(generatedPassword);
+}
+
+// Méthode pour générer un mot de passe fort
+private String generateStrongPassword() {
+    // Définition des caractères possibles pour le mot de passe
+    String uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    String lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
+    String digitChars = "0123456789";
+    String specialChars = "!@#$%^&*()-+";
+
+    // Définition de la longueur du mot de passe
+    int passwordLength = 12;
+
+    // Initialisation du générateur de mot de passe
+    StringBuilder password = new StringBuilder();
+
+    // Ajout d'au moins une lettre majuscule
+    password.append(uppercaseChars.charAt(new Random().nextInt(uppercaseChars.length())));
+
+    // Ajout d'au moins une lettre minuscule
+    password.append(lowercaseChars.charAt(new Random().nextInt(lowercaseChars.length())));
+
+    // Ajout d'au moins un chiffre
+    password.append(digitChars.charAt(new Random().nextInt(digitChars.length())));
+
+    // Ajout d'au moins un caractère spécial
+    password.append(specialChars.charAt(new Random().nextInt(specialChars.length())));
+
+    // Complétion du reste du mot de passe avec des caractères aléatoires
+    for (int i = 4; i < passwordLength; i++) {
+        String allChars = uppercaseChars + lowercaseChars + digitChars + specialChars;
+        password.append(allChars.charAt(new Random().nextInt(allChars.length())));
+    }
+
+    // Mélange aléatoire des caractères du mot de passe
+    List<Character> charsList = password.chars().mapToObj(c -> (char) c).collect(Collectors.toList());
+    Collections.shuffle(charsList);
+    StringBuilder shuffledPassword = new StringBuilder();
+    charsList.forEach(shuffledPassword::append);
+
+    return shuffledPassword.toString();
+}
+
+}
 
 

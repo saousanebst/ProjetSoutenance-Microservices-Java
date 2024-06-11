@@ -18,6 +18,8 @@ private String Id;
 
 private String idUser;
 
+private String password;
+
 private String passwordValue;
 
 private LocalDateTime DateAjout;
@@ -64,6 +66,14 @@ public String getIdUser() {
 
 public void setIdUser(String idUser) {
     this.idUser = idUser;
+}
+
+public String getPassword() {
+    return password;
+}
+
+public void setPassword(String password) {
+    this.password = password;
 }
 
 
