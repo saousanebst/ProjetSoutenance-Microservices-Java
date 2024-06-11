@@ -25,7 +25,7 @@ public class CompteSrv {
             updatedCompte.setPlatformDescription(compte.getPlatformDescription());
             updatedCompte.setUsername(compte.getUsername());
             updatedCompte.setUrlAdress(compte.getUrlAdress());
-            updatedCompte.setPasswordPlatform(compte.getPasswordPlatform());
+            updatedCompte.setPassword(compte.getPassword());
             updatedCompte.setUpdateDate(LocalDate.now());
             return compteRepository.save(updatedCompte);
         } else {
