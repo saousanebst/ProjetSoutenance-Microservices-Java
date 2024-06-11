@@ -124,7 +124,7 @@ public PasswordCheckResponse checkPasswordStrength(PasswordCheckRequest request)
         return new PasswordCheckResponse(false, false, "Password cannot be null");
     }
 
-    boolean isStrong = isStrongPassword(request.getPasswordPlatform());
+    boolean isStrong = isStrongPassword(request.getPassword());
     String message = isStrong ? "Password is strong" : "Password is weak";
     return new PasswordCheckResponse(isStrong, false, message);
 }
@@ -166,7 +166,7 @@ public PasswordCheckResponse checkPasswordStrength(PasswordCheckRequest request)
 
 // Méthode pour vérifier si un mot de passe est vulnérable
 public PasswordCheckResponse checkPasswordVulnerability(PasswordCheckRequest request) {
-    boolean isVulnerable = isPasswordVulnerable(request.getPasswordPlatform());
+    boolean isVulnerable = isPasswordVulnerable(request.getPassword());
     String message = isVulnerable ? "Password is vulnerable" : "Password is not found in the list of stolen passwords";
     return new PasswordCheckResponse(false, isVulnerable, message);
 }
