@@ -2,21 +2,23 @@ package fr.projet.Request;
 
 public class PasswordCheckRequest {
 
-    private String passwordPlatform;
+    private String password;
 
     public PasswordCheckRequest(){}
 
-    public PasswordCheckRequest(String passwordPlatform) {
-        this.passwordPlatform = passwordPlatform;
+    public String getPassword() {
+        return password;
     }
 
-    public String getPasswordPlatform() {
-        return passwordPlatform;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public void setPasswordPlatform(String passwordPlatform) {
-        this.passwordPlatform = passwordPlatform;
+    public PasswordCheckRequest(String password) {
+        this.password = password;
     }
+
+    
 
 
     
