@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -23,7 +24,8 @@ public String getPasswordByUserId(@PathVariable("id") String id);
     void resetPassword(@RequestParam String token, @RequestParam String newPassword);
 
   
-
+@PutMapping("/utilisateur/update")
+    void updatePassword(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword);
 
 
  @Component
@@ -45,6 +47,12 @@ public String getPasswordByUserId(@PathVariable("id") String id);
         public void requestPasswordReset(String email) {
  
     }
+
+
+        @Override
+        public void updatePassword(String id, String newPassword) {
+            // TODO A stub
+        }
     }
 
 }

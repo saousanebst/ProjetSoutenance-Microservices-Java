@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -69,9 +70,10 @@ public List<UtilisateurResponse> findAll() {
          List<CompteResponse> comptes = compteFeignClient.getComptesByUtilisateurId(utilisateur.getId());
         List<NoteResponse> notes = noteFeignClient.getNotesByUtilisateurId(utilisateur.getId());
 
+        String password = passwordFeignClient.getPasswordByUserId(utilisateur.getId());
         utilisateurResponse.setComptes(comptes);
         utilisateurResponse.setNotes(notes);
-           
+        utilisateurResponse.setPasswordValue(password);
 
            response.add(utilisateurResponse);
          }
@@ -154,6 +156,14 @@ return ResponseEntity.notFound().build();
      passwordFeignClient.resetPassword(token, newPassword);
      return ResponseEntity.ok("Password has been reset.");
  }
+@PutMapping("/update")
+    public ResponseEntity<Void> updatePassword(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword) {
+       
+        passwordFeignClient.updatePassword(id, newPassword);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 
