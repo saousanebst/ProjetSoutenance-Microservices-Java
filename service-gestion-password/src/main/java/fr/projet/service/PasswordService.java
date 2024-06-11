@@ -178,6 +178,9 @@ public PasswordCheckResponse checkPasswordVulnerability(PasswordCheckRequest req
     return false;
 }
 
+
+
+
  // Générer un mot de passe fort
  public PasswordGeneratedResponse generatePassword() {
     String generatedPassword = generateStrongPassword();
@@ -223,6 +226,7 @@ private String generateStrongPassword() {
     charsList.forEach(shuffledPassword::append);
 
     return shuffledPassword.toString();
+
 }
 
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import fr.projet.request.PasswordCheckRequest;
 import fr.projet.response.PasswordCheckResponse;
+import fr.projet.response.PasswordGeneratedResponse;
 
 
 @FeignClient(value = "service-gestion-password", path = "/api/password")
@@ -22,7 +23,7 @@ public interface PasswordFeignClient {
 
 
     @PostMapping("/compte/generate")
-    PasswordCheckResponse generatePassword();
+    PasswordGeneratedResponse generatePassword();
 
     
 }
