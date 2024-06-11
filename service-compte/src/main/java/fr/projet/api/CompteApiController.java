@@ -25,6 +25,7 @@ import fr.projet.request.CreateCompteRequest;
 import fr.projet.request.PasswordCheckRequest;
 import fr.projet.response.CompteResponse;
 import fr.projet.response.PasswordCheckResponse;
+import fr.projet.response.PasswordGeneratedResponse;
 import fr.projet.service.CompteSrv;
 
 @RestController
@@ -134,8 +135,8 @@ private PasswordFeignClient passwordFeignClient;
     //generate
 
     @PostMapping("/generate")
-    public ResponseEntity<PasswordCheckResponse> generatePassword() {
-        PasswordCheckResponse response = passwordFeignClient.generatePassword();
+    public ResponseEntity<PasswordGeneratedResponse> generatePassword() {
+        PasswordGeneratedResponse response = passwordFeignClient.generatePassword();
         return ResponseEntity.ok(response);
     }
 

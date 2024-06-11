@@ -3,25 +3,28 @@ package fr.projet.Response;
 public class PasswordGeneratedResponse {
 
 
-    private String passwordPlatforme;
+    private String password;
 
     
     public PasswordGeneratedResponse() {
     }
 
-    public PasswordGeneratedResponse(String passwordPlatforme) {
-        this.passwordPlatforme = passwordPlatforme;
+
+    public PasswordGeneratedResponse(String password) {
+        this.password = password;
     }
 
-    public String getPasswordPlatforme() {
-        return passwordPlatforme;
+
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordPlatforme(String passwordPlatforme) {
-        this.passwordPlatforme = passwordPlatforme;
-    };
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
+    
     
 
 
