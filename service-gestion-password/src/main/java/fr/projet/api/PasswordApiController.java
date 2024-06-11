@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import fr.projet.Request.CreatePasswordRequest;
-
+import fr.projet.Request.PasswordCheckRequest;
+import fr.projet.Response.PasswordCheckResponse;
+import fr.projet.Response.PasswordGeneratedResponse;
 import fr.projet.model.Password;
 import fr.projet.repository.PasswordRepository;
 import fr.projet.service.PasswordService;
@@ -90,6 +92,22 @@ public ResponseEntity<String> resetPassword(@RequestParam String token, @Request
 }
 
     
-    
+@PostMapping("/compte/check-strength")
+    public PasswordCheckResponse checkPasswordStrength(@RequestBody PasswordCheckRequest request) {
+        // Implémentez la logique pour vérifier la force du mot de passe dans le service
+        return passwordSrv.checkPasswordStrength(request);
+    }
+
+    @PostMapping("/compte/check-vulnerability")
+    public PasswordCheckResponse checkPasswordVulnerability(@RequestBody PasswordCheckRequest request) {
+        // Implémentez la logique pour vérifier la vulnérabilité du mot de passe dans le service
+        return passwordSrv.checkPasswordVulnerability(request);
+    }
+
+    @PostMapping("/compte/generate")
+    public PasswordGeneratedResponse generatePassword() {
+        // Implémentez la logique pour générer un mot de passe fort dans le service
+        return passwordSrv.generatePassword();
+    }
 
 }

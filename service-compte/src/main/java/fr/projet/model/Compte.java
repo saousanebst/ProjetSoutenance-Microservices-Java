@@ -32,7 +32,7 @@ public class Compte{
 
     @Column(nullable=false)
     
-    private String passwordPlatform;
+    private String password;
 
     private String idUser;
 
@@ -93,13 +93,7 @@ public class Compte{
         this.urlAdress = urlAdress;
     }
 
-    public String getPasswordPlatform() {
-        return this.passwordPlatform;
-    }
-
-    public void setPasswordPlatform(String passwordPlatform) {
-        this.passwordPlatform = passwordPlatform;
-    }
+   
 
     public String getIdUser() {
         return idUser;
@@ -107,6 +101,14 @@ public class Compte{
 
     public void setIdUser(String idUser) {
         this.idUser = idUser;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 
