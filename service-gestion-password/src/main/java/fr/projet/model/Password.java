@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.UuidGenerator;
 
+import io.github.resilience4j.core.lang.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -17,7 +19,7 @@ public class Password {
 private String Id;
 
 private String idUser;
-
+@Column(nullable = false)
 private String password;
 
 private String passwordValue;
@@ -25,6 +27,9 @@ private String passwordValue;
 private LocalDateTime DateAjout;
 
 private LocalDateTime DateModif;
+
+
+
 
 public String getId() {
     return Id;
