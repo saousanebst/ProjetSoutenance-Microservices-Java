@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import fr.projet.Request.PasswordCheckRequest;
@@ -34,7 +35,8 @@ private PasswordRepository passwordRepository;
 @Autowired
 private PasswordResetTokenRepository passwordResetTokenRepository;
 
-
+ @Autowired
+private JdbcTemplate clickHouseJdbcTemplate;
 
 //create password
 
@@ -166,16 +168,24 @@ public PasswordCheckResponse checkPasswordStrength(PasswordCheckRequest request)
 
 // Méthode pour vérifier si un mot de passe est vulnérable
 public PasswordCheckResponse checkPasswordVulnerability(PasswordCheckRequest request) {
+    // Appelle la méthode isPasswordVulnerable pour déterminer si le mot de passe est vulnérable
     boolean isVulnerable = isPasswordVulnerable(request.getPassword());
+    // Crée un message en fonction du résultat de la vérification de la vulnérabilité
     String message = isVulnerable ? "Password is vulnerable" : "Password is not found in the list of stolen passwords";
+    // Retourne une réponse indiquant si le mot de passe est vulnérable ou non
     return new PasswordCheckResponse(false, isVulnerable, message);
 }
 
-  // Méthode pour vérifier si un mot de passe est vulnérable
-  private boolean isPasswordVulnerable(String password) {
+// Méthode pour vérifier si un mot de passe est vulnérable
+private boolean isPasswordVulnerable(String password) {
+    // Hash du mot de passe fourni par l'utilisateur
     String passwordHash = DigestUtils.sha1Hex(password);
-    // Comparer le hash du mot de passe avec les hashes stockés dans les fichiers
-    return false;
+    // Requête SQL pour compter le nombre d'occurrences du hash du mot de passe dans la table stolen_passwords
+    String sql = "SELECT COUNT(*) FROM stolen_passwords WHERE hash = ?";
+    // Exécute la requête et récupère le résultat (nombre d'occurrences)
+    Integer count = clickHouseJdbcTemplate.queryForObject(sql, Integer.class, passwordHash);
+    // Si le nombre d'occurrences est supérieur à 0, le mot de passe est considéré comme vulnérable
+    return count != null && count > 0;
 }
 
 
