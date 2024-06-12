@@ -1,4 +1,4 @@
-package fr.projet;
+package fr.projet.model;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -6,18 +6,11 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+public class RSAKeyGenerator {
+    
 
-@SpringBootApplication
-@EnableFeignClients
-public class ServiceGestionPasswordApplication {
-
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(ServiceGestionPasswordApplication.class, args);
-
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+    public static void main(String[] args) throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
@@ -29,8 +22,4 @@ public class ServiceGestionPasswordApplication {
         System.out.println("Public Key: " + publicKeyBase64);
         System.out.println("Private Key: " + privateKeyBase64);
     }
-	}
-
-
-	
-
+}
