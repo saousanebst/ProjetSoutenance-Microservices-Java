@@ -94,7 +94,6 @@ private PasswordFeignClient passwordFeignClient;
     @ResponseStatus(HttpStatus.CREATED)
     public String create(@RequestBody CreateCompteRequest request) {
         Compte  compte= new Compte();
-        
         BeanUtils.copyProperties(request, compte);
 
         this.compteRepository.save(compte);
