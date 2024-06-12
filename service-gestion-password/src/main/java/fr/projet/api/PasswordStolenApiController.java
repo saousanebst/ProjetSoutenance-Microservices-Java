@@ -60,7 +60,7 @@ private static final Logger log = LoggerFactory.getLogger(PasswordStolenApiContr
     }
 
     private void storeHashedPasswords(Set<String> hashedPasswords) {
-        try (Connection connection = DriverManager.getConnection("jdbc:clickhouse://127.0.0.1:8123/stolen_passwords", "default", "")) {
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/stolen_passwords", "postgres", "root")) {
             try (PreparedStatement statement = connection.prepareStatement("INSERT INTO stolen_password (hash) VALUES (?)")) {
                 for (String hashedPassword : hashedPasswords) {
                     statement.setString(1, hashedPassword);

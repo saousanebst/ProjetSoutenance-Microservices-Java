@@ -181,7 +181,7 @@ private boolean isPasswordVulnerable(String password) {
     // Hash du mot de passe fourni par l'utilisateur
     String passwordHash = DigestUtils.sha1Hex(password);
     // Requête SQL pour compter le nombre d'occurrences du hash du mot de passe dans la table stolen_passwords
-    String sql = "SELECT COUNT(*) FROM stolen_passwords WHERE hash = ?";
+    String sql = "SELECT COUNT(*) FROM stolen_password WHERE hash = ?";
     // Exécute la requête et récupère le résultat (nombre d'occurrences)
     Integer count = clickHouseJdbcTemplate.queryForObject(sql, Integer.class, passwordHash);
     // Si le nombre d'occurrences est supérieur à 0, le mot de passe est considéré comme vulnérable
