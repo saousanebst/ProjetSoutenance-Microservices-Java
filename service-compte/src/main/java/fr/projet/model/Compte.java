@@ -16,7 +16,7 @@ public class Compte{
     @Id
     @UuidGenerator
     private String id;
-
+    private String publicKey;
     @Column(nullable=false)
     private String platformName;
 
@@ -111,6 +111,15 @@ public class Compte{
         this.password = password;
     }
 
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+   
 
 
 

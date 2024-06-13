@@ -6,6 +6,8 @@ import java.util.Base64;
 
 import javax.crypto.Cipher;
 
+//Chiffrer et déchiffrer la clé AES avec RSA
+
 public class RSAUtil {
     
      public static String encryptWithPublicKey(String data, PublicKey publicKey) throws Exception {
