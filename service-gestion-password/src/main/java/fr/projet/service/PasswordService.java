@@ -51,8 +51,6 @@ private JdbcTemplate jdbcTemplate;
 
 //update 
 
- 
-
     public void updatePassword(String idUser, String newPassword) {
         Optional<Password> optionalPassword = passwordRepository.findById(idUser);
         if (optionalPassword.isPresent()) {
@@ -188,9 +186,6 @@ private boolean isPasswordVulnerable(String password) {
     return count != null && count > 0;
 }
 
-
-
-
  // Générer un mot de passe fort
  public PasswordGeneratedResponse generatePassword() {
     String generatedPassword = generateStrongPassword();
@@ -239,6 +234,28 @@ private String generateStrongPassword() {
 
 }
 
+
+
+
+// public void  generatedKeyPair (){
+
+
+// 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+//         keyPairGenerator.initialize(2048);
+//         KeyPair keyPair = keyPairGenerator.generateKeyPair();
+//         PublicKey publicKey = keyPair.getPublic();
+//         PrivateKey privateKey = keyPair.getPrivate();
+
+//         String publicKeyBase64 = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+//         String privateKeyBase64 = Base64.getEncoder().encodeToString(privateKey.getEncoded());
+
+//         System.out.println("Public Key: " + publicKeyBase64);
+//         System.out.println("Private Key: " + privateKeyBase64);
+
+
+
+
+// }
 }
 
 
