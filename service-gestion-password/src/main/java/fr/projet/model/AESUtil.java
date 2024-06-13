@@ -9,6 +9,10 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+
+//Chiffrer et déchiffrer les mots de passe des utilisateurs
+//chiffrer un mot de passe avec AES, puis chiffrer la clé AES avec RSA
+
 public class AESUtil {
 
 
