@@ -7,7 +7,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import javax.sql.DataSource;
 
 @Configuration
-public class ClickHouseConfig {
+public class Config {
 
     @Bean
     public DataSource dataSource() {
