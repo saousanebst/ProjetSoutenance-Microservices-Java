@@ -17,17 +17,6 @@ public class ServiceGestionPasswordApplication {
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(ServiceGestionPasswordApplication.class, args);
 
-		// KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        // keyPairGenerator.initialize(2048);
-        // KeyPair keyPair = keyPairGenerator.generateKeyPair();
-        // PublicKey publicKey = keyPair.getPublic();
-        // PrivateKey privateKey = keyPair.getPrivate();
-
-        // String publicKeyBase64 = Base64.getEncoder().encodeToString(publicKey.getEncoded());
-        // String privateKeyBase64 = Base64.getEncoder().encodeToString(privateKey.getEncoded());
-
-        // System.out.println("Public Key: " + publicKeyBase64);
-        // System.out.println("Private Key: " + privateKeyBase64);
     }
 	}
 
