@@ -3,17 +3,19 @@ package fr.projet.model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+//Insérez la clé publique et les mots de passe chiffrés dans la table
+
 public class PasswordStorage {
     @Autowired
-    private JdbcTemplate clickHouseJdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
-    public void storePassword(int id, String encryptedPassword, String publicKey) {
-        String sql = "INSERT INTO passwords (id, encrypted_password, public_key) VALUES (?, ?, ?)";
-        clickHouseJdbcTemplate.update(sql, id, encryptedPassword, publicKey);
+    public void storePassword(String password, String publicKey) {
+        String sql = "INSERT INTO compte (password, public_key) VALUES (?, ?)";
+        jdbcTemplate.update(sql,password, publicKey);
     }
 
     public String getPublicKey() {
-        String sql = "SELECT public_key FROM passwords LIMIT 1";
-        return clickHouseJdbcTemplate.queryForObject(sql, String.class);
+        String sql = "SELECT public_key FROM compte LIMIT 1";
+        return jdbcTemplate.queryForObject(sql, String.class);
     }
 }
