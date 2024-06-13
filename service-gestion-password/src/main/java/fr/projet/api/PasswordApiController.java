@@ -56,8 +56,6 @@ private PasswordRepository passwordRepository;
         return password.getId();
     }
 
-  
-
 
 //update 
 
@@ -74,8 +72,6 @@ public ResponseEntity<Void> updatePassword(@RequestParam("idUser") String idUser
         return passwordSrv.getPasswordByUserId(idUser);
     }
 
-
-    
 
 //reset
 
