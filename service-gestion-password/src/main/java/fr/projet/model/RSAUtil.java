@@ -5,24 +5,25 @@ import java.security.PublicKey;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 //Chiffrer et déchiffrer la clé AES avec RSA
 
 public class RSAUtil {
-    
-     public static String encryptWithPublicKey(String data, PublicKey publicKey) throws Exception {
+   
+
+    public static String encryptAESKey(SecretKey aesKey, PublicKey publicKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        byte[] encryptedData = cipher.doFinal(data.getBytes());
-        return Base64.getEncoder().encodeToString(encryptedData);
+        byte[] encryptedKey = cipher.doFinal(aesKey.getEncoded());
+        return Base64.getEncoder().encodeToString(encryptedKey);
     }
 
-
-   
-    public static String decryptWithPrivateKey(String encryptedData, PrivateKey privateKey) throws Exception {
+    public static SecretKey decryptAESKey(String encryptedKey, PrivateKey privateKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        byte[] decryptedData = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
-        return new String(decryptedData);
+        byte[] decryptedKey = cipher.doFinal(Base64.getDecoder().decode(encryptedKey));
+        return new SecretKeySpec(decryptedKey, 0, decryptedKey.length, "AES");
     }
 }

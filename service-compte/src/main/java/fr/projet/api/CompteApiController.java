@@ -87,13 +87,10 @@ private PasswordFeignClient passwordFeignClient;
     }
 
 
-
-//Create
-
- @PostMapping("/ajout")
+    @PostMapping("/ajout")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
-        // Appeler le service de vérification de la vulnérabilité du mot de passe
+        // Vérification de la vulnérabilité du mot de passe
         PasswordCheckRequest passwordCheckRequest = new PasswordCheckRequest(request.getPassword());
         PasswordCheckResponse passwordCheckResponse = passwordFeignClient.checkPasswordVulnerability(passwordCheckRequest);
     
@@ -102,64 +99,103 @@ private PasswordFeignClient passwordFeignClient;
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est vulnérable");
         }
 
+        // Vérification de la force du mot de passe
+        PasswordCheckResponse strengthResponse = passwordFeignClient.checkPasswordStrength(passwordCheckRequest);
+        if (!strengthResponse.isStrong()) {
+            // Générer un mot de passe fort
+            PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password is not strong enough. Suggested password: " + generatedResponse.getPassword());
+        }
 
-  // Check password strength
-  PasswordCheckResponse strengthResponse = passwordFeignClient.checkPasswordStrength(passwordCheckRequest);
-  if (!strengthResponse.isStrong()) {
-      // Generate strong password
-      PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password is not strong enough. Suggested password: " + generatedResponse.getPassword());
-  }
+        try {
+            // Chiffrer le mot de passe avec RSA
+            String encryptedPassword = passwordFeignClient.encryptPassword(request.getPassword());
 
-         // Si le mot de passe est valide et fort, créer le compte
-        Compte compte = new Compte();
+            // Si le mot de passe est valide et fort, créer le compte
+            Compte compte = new Compte();
+            BeanUtils.copyProperties(request, compte);
+            compte.setPassword(encryptedPassword); // Enregistrer le mot de passe chiffré
+            this.compteRepository.save(compte);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(compte.getId());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors du chiffrement du mot de passe");
+        }
+    }
 
 
-        BeanUtils.copyProperties(request, compte);
-        this.compteRepository.save(compte);
+// //Create
+
+//  @PostMapping("/ajout")
+//     @ResponseStatus(HttpStatus.CREATED)
+//     public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
+//         // Appeler le service de vérification de la vulnérabilité du mot de passe
+//         PasswordCheckRequest passwordCheckRequest = new PasswordCheckRequest(request.getPassword());
+//         PasswordCheckResponse passwordCheckResponse = passwordFeignClient.checkPasswordVulnerability(passwordCheckRequest);
     
-        return ResponseEntity.status(HttpStatus.CREATED).body(compte.getId());
-    }
+//         // Si le mot de passe est vulnérable, renvoyer une réponse d'erreur
+//         if (passwordCheckResponse.isVulnerable()) {
+//             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est vulnérable");
+//         }
+
+
+//   // Check password strength
+//   PasswordCheckResponse strengthResponse = passwordFeignClient.checkPasswordStrength(passwordCheckRequest);
+//   if (!strengthResponse.isStrong()) {
+//       // Generate strong password
+//       PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
+//       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password is not strong enough. Suggested password: " + generatedResponse.getPassword());
+//   }
+
+//          // Si le mot de passe est valide et fort, créer le compte
+//         Compte compte = new Compte();
+
+
+//         BeanUtils.copyProperties(request, compte);
+//         this.compteRepository.save(compte);
+    
+//         return ResponseEntity.status(HttpStatus.CREATED).body(compte.getId());
+//     }
 
 
 
-//update
+// //update
 
-@PutMapping("/{id}")
-	public Compte updateCompte (@PathVariable String id,@RequestBody Compte compte) 
-	{
-		compte.setId(id);
-		return compteService.update(compte);
-	}
+// @PutMapping("/{id}")
+// 	public Compte updateCompte (@PathVariable String id,@RequestBody Compte compte) 
+// 	{
+// 		compte.setId(id);
+// 		return compteService.update(compte);
+// 	}
 	
-//delete	
-	@DeleteMapping("/{id}")
-	public void deleteById(@PathVariable String id) 
-	{
-		compteService.deleteCompteById(id);
-	}
+// //delete	
+// 	@DeleteMapping("/{id}")
+// 	public void deleteById(@PathVariable String id) 
+// 	{
+// 		compteService.deleteCompteById(id);
+// 	}
 
-//check strength and vulnerability
+// //check strength and vulnerability
  
-    @PostMapping("/check-strength")
-    public ResponseEntity<PasswordCheckResponse> checkPasswordStrength(@RequestBody PasswordCheckRequest request) {
-        PasswordCheckResponse response = passwordFeignClient.checkPasswordStrength(request);
-        return ResponseEntity.ok(response);
-    }
+//     @PostMapping("/check-strength")
+//     public ResponseEntity<PasswordCheckResponse> checkPasswordStrength(@RequestBody PasswordCheckRequest request) {
+//         PasswordCheckResponse response = passwordFeignClient.checkPasswordStrength(request);
+//         return ResponseEntity.ok(response);
+//     }
 
-    @PostMapping("/check-vulnerability")
-    public ResponseEntity<PasswordCheckResponse> checkPasswordVulnerability(@RequestBody PasswordCheckRequest request) {
-        PasswordCheckResponse response = passwordFeignClient.checkPasswordVulnerability(request);
-        return ResponseEntity.ok(response);
-    }
+//     @PostMapping("/check-vulnerability")
+//     public ResponseEntity<PasswordCheckResponse> checkPasswordVulnerability(@RequestBody PasswordCheckRequest request) {
+//         PasswordCheckResponse response = passwordFeignClient.checkPasswordVulnerability(request);
+//         return ResponseEntity.ok(response);
+//     }
 
-    //generate
+//     //generate
 
-    @PostMapping("/generate")
-    public ResponseEntity<PasswordGeneratedResponse> generatePassword() {
-        PasswordGeneratedResponse response = passwordFeignClient.generatePassword();
-        return ResponseEntity.ok(response);
-    }
+//     @PostMapping("/generate")
+//     public ResponseEntity<PasswordGeneratedResponse> generatePassword() {
+//         PasswordGeneratedResponse response = passwordFeignClient.generatePassword();
+//         return ResponseEntity.ok(response);
+//     }
 
 }
 

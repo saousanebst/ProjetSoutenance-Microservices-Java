@@ -25,6 +25,11 @@ public interface PasswordFeignClient {
     @PostMapping("/compte/generate")
     PasswordGeneratedResponse generatePassword();
 
+
+    //@PostMapping("/api/password/encrypt")
+    @PostMapping("/compte/encrypt")
+    String encryptPassword(@RequestBody String plainPassword);
+
     
 }
 
