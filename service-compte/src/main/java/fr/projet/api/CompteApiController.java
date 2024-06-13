@@ -90,16 +90,38 @@ private PasswordFeignClient passwordFeignClient;
 
 //Create
 
-@PostMapping("/ajout")
+ @PostMapping("/ajout")
     @ResponseStatus(HttpStatus.CREATED)
-    public String create(@RequestBody CreateCompteRequest request) {
-        Compte  compte= new Compte();
+    public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
+        // Appeler le service de vérification de la vulnérabilité du mot de passe
+        PasswordCheckRequest passwordCheckRequest = new PasswordCheckRequest(request.getPassword());
+        PasswordCheckResponse passwordCheckResponse = passwordFeignClient.checkPasswordVulnerability(passwordCheckRequest);
+    
+        // Si le mot de passe est vulnérable, renvoyer une réponse d'erreur
+        if (passwordCheckResponse.isVulnerable()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est vulnérable");
+        }
+
+
+  // Check password strength
+  PasswordCheckResponse strengthResponse = passwordFeignClient.checkPasswordStrength(passwordCheckRequest);
+  if (!strengthResponse.isStrong()) {
+      // Generate strong password
+      PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password is not strong enough. Suggested password: " + generatedResponse.getPassword());
+  }
+
+         // Si le mot de passe est valide et fort, créer le compte
+        Compte compte = new Compte();
+
+
         BeanUtils.copyProperties(request, compte);
-
         this.compteRepository.save(compte);
-
-        return compte.getId();
+    
+        return ResponseEntity.status(HttpStatus.CREATED).body(compte.getId());
     }
+
+
 
 //update
 
