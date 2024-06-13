@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.projet.model.Compte;
+import fr.projet.model.PrivateKey;
 import fr.projet.repository.CompteRepository;
+import fr.projet.repository.PrivateKeyRepository;
 
 @Service
 public class CompteSrv {
@@ -14,6 +16,9 @@ public class CompteSrv {
 
     @Autowired
     private CompteRepository compteRepository;
+
+    @Autowired
+    private PrivateKeyRepository privateKeyRepository;
 
 //update id
  
@@ -52,5 +57,18 @@ public Compte findById(String id) {
             throw new RuntimeException("Compte not found with id " + id);
         }
     }
+
+public PrivateKey findByCompteId(String compteId){
+
+    Optional<PrivateKey> privateKey = privateKeyRepository.findByCompteId(compteId);
+    if (privateKey.isPresent()) {
+        return privateKey.get();
+    } else {
+        throw new RuntimeException(" key not found with id " + privateKey);
+    }
+
+}
+
+
 
 }

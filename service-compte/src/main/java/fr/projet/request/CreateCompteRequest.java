@@ -11,7 +11,7 @@ public class CreateCompteRequest {
 
     private LocalDate creationDate;
 
-    private LocalDate updateDate;
+    
 
     private String username;
 
@@ -36,12 +36,7 @@ public class CreateCompteRequest {
     public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
-    public LocalDate getUpdateDate() {
-        return updateDate;
-    }
-    public void setUpdateDate(LocalDate updateDate) {
-        this.updateDate = updateDate;
-    }
+  
     public String getUsername() {
         return username;
     }
