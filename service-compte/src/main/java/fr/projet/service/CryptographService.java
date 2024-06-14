@@ -15,6 +15,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
@@ -33,9 +34,22 @@ public class CryptographService {
 
 
 
-    public String encryptPassword(String password) {
-        return passwordEncoder.encode(password);
+
+        public String encryptPasswordWithPublicKey(String password, String publicKeyStr) throws Exception {
+        byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyStr);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        byte[] encryptedPasswordBytes = cipher.doFinal(password.getBytes("UTF-8"));
+
+        return Base64.getEncoder().encodeToString(encryptedPasswordBytes);
     }
+
+
+
+
 
 
     public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
