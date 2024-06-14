@@ -4,6 +4,7 @@ import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -144,6 +146,35 @@ try {
        
         }
     
+
+
+        @PostMapping("/decryptPassword")
+public ResponseEntity<String> decryptPassword(@RequestParam String compteId) {
+    try {
+        // Récupérer les informations du compte et la clé privée
+        Optional<Compte> compteOptional = compteRepository.findById(compteId);
+        if (!compteOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Compte non trouvé");
+        }
+
+        Compte compte = compteOptional.get();
+        Optional<PrivateKey> privateKeyOptional = privateKeyRepository.findByCompteId(compteId);
+        if (!privateKeyOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Clé privée non trouvée pour ce compte");
+        }
+
+        String encryptedPassword = compte.getPassword();
+        String privateKeyStr = privateKeyOptional.get().getPrivateKey();
+
+        // Décrypter le mot de passe
+        String decryptedPassword = cryptographService.decryptPassword(encryptedPassword, privateKeyStr);
+
+        return ResponseEntity.ok(decryptedPassword);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors du déchiffrement du mot de passe");
+    }
+}
+
 
 
 

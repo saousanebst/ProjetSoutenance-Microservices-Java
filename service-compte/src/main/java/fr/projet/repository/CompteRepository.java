@@ -16,14 +16,4 @@ public List<Compte> findAllByIdUser (String idUser);
 
 
 
-
-
-
-
-
-
-
-
-
-
 }
