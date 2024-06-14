@@ -104,48 +104,49 @@ private PrivateKeyRepository  privateKeyRepository;
     @PostMapping("/ajout")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
-        // Vérification de la vulnérabilité du mot de passe
-        PasswordCheckRequest passwordCheckRequest = new PasswordCheckRequest(request.getPassword());
-        PasswordCheckResponse passwordCheckResponse = passwordFeignClient.checkPasswordVulnerability(passwordCheckRequest);
+        try {
+            // Vérification de la vulnérabilité du mot de passe
+            PasswordCheckRequest passwordCheckRequest = new PasswordCheckRequest(request.getPassword());
+            PasswordCheckResponse passwordCheckResponse = passwordFeignClient.checkPasswordVulnerability(passwordCheckRequest);
     
-        // Si le mot de passe est vulnérable, renvoyer une réponse d'erreur
-        if (passwordCheckResponse.isVulnerable()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est vulnérable");
-        }
-
-        // Vérification de la force du mot de passe
-        PasswordCheckResponse strengthResponse = passwordFeignClient.checkPasswordStrength(passwordCheckRequest);
-        if (!strengthResponse.isStrong()) {
-            // Générer un mot de passe fort
-            PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password is not strong enough. Suggested password: " + generatedResponse.getPassword());
-        }
-          
-try {
-        String encryptedPassword = cryptographService.encryptPassword(request.getPassword());
+            // Si le mot de passe est vulnérable, renvoyer une réponse d'erreur
+            if (passwordCheckResponse.isVulnerable()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est vulnérable");
+            }
+    
+            // Vérification de la force du mot de passe
+            PasswordCheckResponse strengthResponse = passwordFeignClient.checkPasswordStrength(passwordCheckRequest);
+            if (!strengthResponse.isStrong()) {
+                // Générer un mot de passe fort
+                PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe n'est pas assez fort. Mot de passe suggéré : " + generatedResponse.getPassword());
+            }
+    
+            // Générer une paire de clés RSA
             KeyPair keyPair = cryptographService.generateKeyPair();
-            String publicKey = cryptographService.encodePublicKey(keyPair.getPublic());
-            String privateKey = cryptographService.encodePrivateKey(keyPair.getPrivate());
-
+    
+            // Chiffrer le mot de passe avec la clé publique
+            String publicKeyStr = cryptographService.encodePublicKey(keyPair.getPublic());
+            String encryptedPassword = cryptographService.encryptPasswordWithPublicKey(request.getPassword(), publicKeyStr);
+    
+            // Enregistrer le compte avec le mot de passe chiffré et la clé publique
             Compte compte = new Compte();
             BeanUtils.copyProperties(request, compte);
             compte.setPassword(encryptedPassword);
-            compte.setPublicKey(publicKey);
-
+            compte.setPublicKey(publicKeyStr);
             this.compteRepository.save(compte);
-
-            PrivateKey privateKeyEntity = new PrivateKey();
-            privateKeyEntity.setCompteId(compte.getId());
-            privateKeyEntity.setPrivateKey(privateKey);
-            this.privateKeyRepository.save(privateKeyEntity);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(compte.getId());
-        } catch (NoSuchAlgorithmException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la génération de la clé");
-        }
-       
-        }
     
+            // Enregistrer la clé privée associée au compte
+            PrivateKey privateKey = new PrivateKey();
+            privateKey.setCompteId(compte.getId());
+            privateKey.setPrivateKey(cryptographService.encodePrivateKey(keyPair.getPrivate()));
+            this.privateKeyRepository.save(privateKey);
+    
+            return ResponseEntity.status(HttpStatus.CREATED).body(compte.getId());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création du compte : " + e.getMessage());
+        }
+    }
 
 
         @PostMapping("/decryptPassword")
@@ -163,15 +164,14 @@ public ResponseEntity<String> decryptPassword(@RequestParam String compteId) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Clé privée non trouvée pour ce compte");
         }
 
+        // Décrypter le mot de passe avec la clé privée
         String encryptedPassword = compte.getPassword();
         String privateKeyStr = privateKeyOptional.get().getPrivateKey();
-
-        // Décrypter le mot de passe
         String decryptedPassword = cryptographService.decryptPassword(encryptedPassword, privateKeyStr);
 
         return ResponseEntity.ok(decryptedPassword);
     } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors du déchiffrement du mot de passe");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors du déchiffrement du mot de passe : " + e.getMessage());
     }
 }
 
