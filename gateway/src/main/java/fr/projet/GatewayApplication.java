@@ -43,6 +43,12 @@ public class GatewayApplication {
                     .uri("lb://service-gestion-password")
             )
 
+
+            .route(r ->
+                r   .path("/api/passwordstolen")
+                    .uri("lb://service-gestion-password")
+            )
+
             .build();
     }
 }
