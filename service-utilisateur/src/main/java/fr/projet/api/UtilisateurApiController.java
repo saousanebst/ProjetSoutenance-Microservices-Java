@@ -131,16 +131,22 @@ return ResponseEntity.notFound().build();
 	}
 	
 
-@PostMapping("/inscription")
-	public Utilisateur inscription(@RequestBody InscriptionDTO inscriptionDTO) {
-		
-		Utilisateur utilisateur = new Utilisateur();
-      // copie les propriétés de même type et nom depuis inscriptionDTO vers utilisateur
-		BeanUtils.copyProperties(inscriptionDTO, utilisateur);
+    @PostMapping("/inscription")
+    public ResponseEntity<?> inscription(@RequestBody InscriptionDTO inscriptionDTO) {
+        // Vérifie si un utilisateur avec cet e-mail existe déjà
+        if (utilisateurRepository.existsByEmail(inscriptionDTO.getEmail())) {
+            // Renvoie un message d'erreur si l'e-mail est déjà utilisé
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("L'e-mail existe déjà. Veuillez en choisir un autre.");
+        }
+    
+        Utilisateur utilisateur = new Utilisateur();
+        // Copie les propriétés de même type et nom depuis inscriptionDTO vers utilisateur
+        BeanUtils.copyProperties(inscriptionDTO, utilisateur);
         utilisateur = this.utilisateurRepository.save(utilisateur);
+    
+        return ResponseEntity.status(HttpStatus.CREATED).body(utilisateur);
+    }
 
-		return utilisateur;
-	}
 
 //reset
 
