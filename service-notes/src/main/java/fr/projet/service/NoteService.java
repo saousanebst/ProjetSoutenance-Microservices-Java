@@ -38,6 +38,9 @@ public class NoteService {
 public void deleteNoteById (String id){
     this.noteRepository.deleteById(id);
 }
+
+
+
 //modif partielle
 @PatchMapping("/{id}")
 public Note updatePartiel(Note noteJSON) 
@@ -81,6 +84,10 @@ public Note updatePartiel(Note noteJSON)
 	}
 	
 
+
+
+
+	
 
 
 }
