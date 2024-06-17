@@ -106,4 +106,5 @@ public ResponseEntity<String> resetPassword(@RequestParam String token, @Request
         return passwordSrv.generatePassword();
     }
 
-}
+} 
+
