@@ -2,6 +2,7 @@
 package fr.projet.api;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,6 +21,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -237,10 +242,58 @@ public void testInscription_EmailAlreadyExists() throws Exception {
 }
 
 
+@Test
+    public void testUpdatePassword_UserFound() throws Exception {
+        String idUser = "ajc";
+        String newPassword = "newPassword123@";
 
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setId(idUser);
+        utilisateur.setPassword("111111");
 
+        when(utilisateurRepository.findById(idUser)).thenReturn(Optional.of(utilisateur));
+        when(utilisateurRepository.save(any(Utilisateur.class))).thenReturn(utilisateur);
 
+        mockMvc.perform(put("/api/utilisateur/update")
+                .param("idUser", idUser)
+                .param("newPassword", newPassword)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
+        verify(utilisateurRepository, times(1)).findById(idUser);
+        verify(utilisateurRepository, times(1)).save(any(Utilisateur.class));
+
+        assertEquals(newPassword, utilisateur.getPassword());
+    }
+
+    @Test
+    public void testRequestPasswordReset_Success() throws Exception {
+        String email = "sara@example.com";
+
+        // Simule l'appel du client feign
+        doNothing().when(passwordFeignClient).requestPasswordReset(email);
+
+        // Effectue une requête POST vers /request-reset avec le paramètre email
+        mockMvc.perform(post("/api/utilisateur/request-reset")
+                .param("email", email)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())  // Vérifie que la réponse a un statut 200 OK
+                .andExpect(content().string("Password reset email has been sent."));  // Vérifie le contenu de la réponse
+
+        // Vérifie que la méthode requestPasswordReset a été appelée une fois avec le bon email
+        verify(passwordFeignClient, times(1)).requestPasswordReset(email);
+    }
+
+ @Test
+    public void testRequestPasswordReset_MissingEmail() throws Exception {
+        // Effectue une requête POST vers /request-reset sans paramètre email
+        mockMvc.perform(post("/api/utilisateur/request-reset")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());  // Vérifie que la réponse a un statut 400 Bad Request
+
+        // Vérifie que la méthode requestPasswordReset n'a pas été appelée
+        verify(passwordFeignClient, never()).requestPasswordReset(anyString());
+    }
 
 
 }

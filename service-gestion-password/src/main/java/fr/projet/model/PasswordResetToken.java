@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 public class PasswordResetToken {
     @Id
     @UuidGenerator
-private String id;
+    private String id;
      private String token;
     private String email;
     private LocalDateTime expiryDate;
@@ -53,6 +53,14 @@ private String id;
 
     public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
 

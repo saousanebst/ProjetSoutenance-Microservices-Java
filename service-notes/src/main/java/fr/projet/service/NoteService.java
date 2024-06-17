@@ -3,12 +3,14 @@ package fr.projet.service;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PatchMapping;
 
 import fr.projet.Repository.NoteRepository;
 import fr.projet.model.Note;
+import fr.projet.request.CreateNoteRequest;
 
 @Service
 public class NoteService {
@@ -38,6 +40,9 @@ public class NoteService {
 public void deleteNoteById (String id){
     this.noteRepository.deleteById(id);
 }
+
+
+
 //modif partielle
 @PatchMapping("/{id}")
 public Note updatePartiel(Note noteJSON) 
@@ -80,7 +85,21 @@ public Note updatePartiel(Note noteJSON)
 		
 	}
 	
+public String create(CreateNoteRequest request) {
+        // Générer une note à partir de la requête
+        Note note = new Note();
+        BeanUtils.copyProperties(request, note);
 
+        // Enregistrer la note dans le repository
+        Note savedNote = noteRepository.save(note);
+
+        // Retourner l'ID de la note créée
+        return savedNote.getId();
+    }
+
+
+
+	
 
 
 }

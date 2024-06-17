@@ -88,20 +88,6 @@ PrivateKeyRepository privateKeyRepository;
 
 
 
-// //Create
-
-// @PostMapping("/ajout")
-//     @ResponseStatus(HttpStatus.CREATED)
-//     public String create(@RequestBody CreateNoteRequest request) {
-//         Note  note= new Note();
-        
-//         BeanUtils.copyProperties(request, note);
-
-//         this.noteRepository.save(note);
-
-//         return note.getId();
-//     }
-
 //update
 
 @PutMapping("/{id}")

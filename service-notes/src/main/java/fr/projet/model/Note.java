@@ -25,7 +25,31 @@ private String idUser;
 
 
 private String publicKey;
+public Note(){
+    
+}
 
+public Note(String id, String nom, String description, LocalDate dateModif, String contenu, String idUser) {
+    this.id = id;
+    this.nom = nom;
+    this.description = description;
+    this.dateModif = dateModif;
+    this.contenu = contenu;
+    this.idUser = idUser;
+}
+
+
+
+
+
+public Note(String id, String nom, String description, LocalDate dateAjout, LocalDate dateModif, String contenu) {
+    this.id = id;
+    this.nom = nom;
+    this.description = description;
+    this.dateAjout = dateAjout;
+    this.dateModif = dateModif;
+    this.contenu = contenu;
+}
 
 public String getNom() {
     return nom;
