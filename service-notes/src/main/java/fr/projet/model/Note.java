@@ -6,6 +6,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 @Entity
 @Table(name= "note")
@@ -18,9 +19,12 @@ private String description;
 private LocalDate dateAjout;
 private LocalDate dateModif;
 
-private String contenu;
 
+private String contenu;
 private String idUser;
+
+
+private String publicKey;
 
 
 public String getNom() {
@@ -77,6 +81,14 @@ public String getIdUser() {
 
 public void setIdUser(String idUser) {
     this.idUser = idUser;
+}
+
+public String getPublicKey() {
+    return publicKey;
+}
+
+public void setPublicKey(String publicKey) {
+    this.publicKey = publicKey;
 }
 
 
