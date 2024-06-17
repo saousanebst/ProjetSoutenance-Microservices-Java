@@ -38,6 +38,19 @@ public Note(String id, String nom, String description, LocalDate dateModif, Stri
     this.idUser = idUser;
 }
 
+
+
+
+
+public Note(String id, String nom, String description, LocalDate dateAjout, LocalDate dateModif, String contenu) {
+    this.id = id;
+    this.nom = nom;
+    this.description = description;
+    this.dateAjout = dateAjout;
+    this.dateModif = dateModif;
+    this.contenu = contenu;
+}
+
 public String getNom() {
     return nom;
 }
