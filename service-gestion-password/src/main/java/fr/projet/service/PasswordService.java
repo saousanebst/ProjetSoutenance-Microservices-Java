@@ -33,8 +33,7 @@ public class PasswordService {
 @Autowired
 private PasswordRepository passwordRepository;
 
-// @Autowired
-// private UserFeignClient userFeignClient; // Utilisation d'un client Feign pour obtenir des informations utilisateur
+
 
 
 @Autowired
@@ -116,7 +115,7 @@ private JdbcTemplate jdbcTemplate;
         passwordRepository.save(password);
         }
         
-        private String hashPassword(String password) {
+        String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
         }
 
@@ -180,7 +179,7 @@ public PasswordCheckResponse checkPasswordVulnerability(PasswordCheckRequest req
 }
 
 // Méthode pour vérifier si un mot de passe est vulnérable
-private boolean isPasswordVulnerable(String password) {
+boolean isPasswordVulnerable(String password) {
     // Hash du mot de passe fourni par l'utilisateur
    String passwordHash = DigestUtils.sha1Hex(password);
     // Requête SQL pour compter le nombre d'occurrences du hash du mot de passe dans la table stolen_passwords
@@ -198,7 +197,7 @@ private boolean isPasswordVulnerable(String password) {
 }
 
 // Méthode pour générer un mot de passe fort
-private String generateStrongPassword() {
+String generateStrongPassword() {
     // Définition des caractères possibles pour le mot de passe
     String uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     String lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
