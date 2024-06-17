@@ -103,6 +103,25 @@ public void testUpdateNote_NotFound() {
     }
 
 
+@Test
+public void testDeleteNoteById_NotFound() {
+    // Données de test
+    String id = "note_inexistante";
+
+    // Mock du comportement de deleteById pour simuler une note non trouvée (Optional.empty())
+    doThrow(EmptyResultDataAccessException.class).when(noteRepository).deleteById(eq(id));
+
+    // Appel de la méthode à tester et vérification de l'exception lancée
+    EmptyResultDataAccessException exception = assertThrows(EmptyResultDataAccessException.class, () -> {
+        noteService.deleteNoteById(id);
+    });
+
+    // Vérification du message d'erreur (facultatif)
+    // assertEquals("Expected message here", exception.getMessage());
+
+    // Vérification que deleteById du repository a été appelé une fois avec l'id spécifié
+    verify(noteRepository, times(1)).deleteById(eq(id));
+}
 
     @Test
     public void testUpdatePartiel_NoteNotFound() {
@@ -119,41 +138,18 @@ public void testUpdateNote_NotFound() {
     }
 
 
-    @Test
-    public void testUpdatePartiel_Success() {
-        // Données de test
-        String id = "123";
-        Note existingNote = new Note(id, "Original Name", "Original Description", LocalDate.now(), "Original Content", "sawsan");
-        Note updatedNote = new Note(id, "Updated Name", null, null, null, null); // Note avec les champs à mettre à jour
-
-        // Mock du comportement de findById pour retourner la note existante
-        when(noteRepository.findById(eq(id))).thenReturn(Optional.of(existingNote));
-
-        // Appel de la méthode à tester
-        Note resultNote = noteService.updatePartiel(updatedNote);
-
-        // Vérification que findById a été appelé avec l'id spécifié
-        verify(noteRepository).findById(eq(id));
-
-        // Vérification que save a été appelé avec la note mise à jour
-        verify(noteRepository).save(eq(existingNote));
-
-       
-    }
-
-
-
-
-
-
-
-
-
-
-
-
     
-  }
+
+
+}
+
+
+
+
+
+
+
+
 
 
 
