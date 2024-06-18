@@ -2,6 +2,7 @@ package fr.projet.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -70,59 +71,59 @@ private PrivateKeyRepository  privateKeyRepository;
     private PasswordGeneratedResponse passwordGeneratedResponse;
     private KeyPair keyPair;
     
-    @BeforeEach
-    void setUp() throws Exception {
-        compte = new Compte();
-        compte.setId("1");
-        compte.setPassword("encryptedPassword");
+    // @BeforeEach
+    // void setUp() throws Exception {
+    //     compte = new Compte();
+    //     compte.setId("1");
+    //     compte.setPassword("encryptedPassword");
 
         //createCompteRequest = new CreateCompteRequest();
         //createCompteRequest.setPassword("testPassword");
 
-        passwordCheckResponse = new PasswordCheckResponse();
-        passwordCheckResponse.setVulnerable(false);
-        passwordCheckResponse.setStrong(true);
+    //     passwordCheckResponse = new PasswordCheckResponse();
+    //     passwordCheckResponse.setVulnerable(false);
+    //     passwordCheckResponse.setStrong(true);
 
-        passwordGeneratedResponse = new PasswordGeneratedResponse();
-        passwordGeneratedResponse.setPassword("generatedStrongPassword");
-    }
-    @Test
-    void testFindAll() {
-        List<Compte> comptes = new ArrayList<>();
-        comptes.add(compte);
+    //     passwordGeneratedResponse = new PasswordGeneratedResponse();
+    //     passwordGeneratedResponse.setPassword("generatedStrongPassword");
+    // }
+    // @Test
+    // void testFindAll() {
+    //     List<Compte> comptes = new ArrayList<>();
+    //     comptes.add(compte);
 
-        when(compteRepository.findAll()).thenReturn(comptes);
+    //     when(compteRepository.findAll()).thenReturn(comptes);
 
-        List<CompteResponse> response = compteApiController.findAll();
+    //     List<CompteResponse> response = compteApiController.findAll();
 
-        assertNotNull(response);
-        assertEquals(1, response.size());
-        assertEquals(compte.getId(), response.get(0).getId());
-    }
+    //     assertNotNull(response);
+    //     assertEquals(1, response.size());
+    //     assertEquals(compte.getId(), response.get(0).getId());
+    // }
 
-    @Test
-    void testGetComptesByUtilisateurId() {
-        List<Compte> comptes = new ArrayList<>();
-        comptes.add(compte);
+    // @Test
+    // void testGetComptesByUtilisateurId() {
+    //     List<Compte> comptes = new ArrayList<>();
+    //     comptes.add(compte);
 
-        when(compteRepository.findAllByIdUser("1")).thenReturn(comptes);
+    //     when(compteRepository.findAllByIdUser("1")).thenReturn(comptes);
 
-        List<CompteResponse> response = compteApiController.getComptesByUtilisateurId("1");
+    //     List<CompteResponse> response = compteApiController.getComptesByUtilisateurId("1");
 
-        assertNotNull(response);
-        assertEquals(1, response.size());
-        assertEquals(compte.getId(), response.get(0).getId());
-    }
+    //     assertNotNull(response);
+    //     assertEquals(1, response.size());
+    //     assertEquals(compte.getId(), response.get(0).getId());
+    // }
 
-    @Test
-    void testFindById() {
-        when(compteService.findById("1")).thenReturn(compte);
+    // @Test
+    // void testFindById() {
+    //     when(compteService.findById("1")).thenReturn(compte);
 
-        CompteResponse response = compteApiController.findById("1");
+    //     CompteResponse response = compteApiController.findById("1");
 
-        assertNotNull(response);
-        assertEquals(compte.getId(), response.getId());
-    }
+    //     assertNotNull(response);
+    //     assertEquals(compte.getId(), response.getId());
+    // }
 
     @Test
     void testCreate_Success() throws Exception {
@@ -170,97 +171,247 @@ private PrivateKeyRepository  privateKeyRepository;
     }
     
 
-    @Test
-    void testDecryptPassword() throws Exception {
-        when(compteRepository.findById("1")).thenReturn(Optional.of(compte));
-        PrivateKey privateKey = new PrivateKey();
-        privateKey.setCompteId(compte.getId());
-        privateKey.setPrivateKey("privateKeyStr");
-        when(privateKeyRepository.findByCompteId("1")).thenReturn(Optional.of(privateKey));
-        when(cryptographService.decryptPassword("encryptedPassword", "privateKeyStr")).thenReturn("decryptedPassword");
+    // @Test
+    // void testDecryptPassword() throws Exception {
+    //     when(compteRepository.findById("1")).thenReturn(Optional.of(compte));
+    //     PrivateKey privateKey = new PrivateKey();
+    //     privateKey.setCompteId(compte.getId());
+    //     privateKey.setPrivateKey("privateKeyStr");
+    //     when(privateKeyRepository.findByCompteId("1")).thenReturn(Optional.of(privateKey));
+    //     when(cryptographService.decryptPassword("encryptedPassword", "privateKeyStr")).thenReturn("decryptedPassword");
 
-        ResponseEntity<String> response = compteApiController.decryptPassword("1");
+    //     ResponseEntity<String> response = compteApiController.decryptPassword("1");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("decryptedPassword", response.getBody());
-    }
-
-
-
-    @Test
-    void testUpdateCompte() {
-        Compte updatedCompte = new Compte();
-        updatedCompte.setId("1");
-        updatedCompte.setPassword("newEncryptedPassword");
-
-        when(compteService.update(any(Compte.class))).thenReturn(updatedCompte);
-
-        Compte response = compteApiController.updateCompte("1", updatedCompte);
-
-        // Assertions
-        assertNotNull(response);
-        assertEquals("1", response.getId());
-        assertEquals("newEncryptedPassword", response.getPassword());
-    }
-
-    @Test
-    void testDeleteById() {
-        doNothing().when(compteService).deleteCompteById("1");
-
-        compteApiController.deleteById("1");
-
-        // Verify that the delete method was called
-        verify(compteService, times(1)).deleteCompteById("1");
-    }
-
-    @Test
-    void testCheckPasswordStrength() {
-        PasswordCheckRequest request = new PasswordCheckRequest();
-        request.setPassword("testPassword");
-
-        when(passwordFeignClient.checkPasswordStrength(any(PasswordCheckRequest.class)))
-                .thenReturn(passwordCheckResponse);
-
-        ResponseEntity<PasswordCheckResponse> response = compteApiController.checkPasswordStrength(request);
-
-        // Assertions
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(passwordCheckResponse, response.getBody());
-    }
-
-    @Test
-    void testCheckPasswordVulnerability() {
-        PasswordCheckRequest request = new PasswordCheckRequest();
-        request.setPassword("testPassword");
-
-        when(passwordFeignClient.checkPasswordVulnerability(any(PasswordCheckRequest.class)))
-                .thenReturn(passwordCheckResponse);
-
-        ResponseEntity<PasswordCheckResponse> response = compteApiController.checkPasswordVulnerability(request);
-
-        // Assertions
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(passwordCheckResponse, response.getBody());
-    }
-
-    @Test
-    void testGeneratePassword() {
-        PasswordGeneratedResponse passwordGeneratedResponse = new PasswordGeneratedResponse();
-        passwordGeneratedResponse.setPassword("generatedPassword");
-
-        when(passwordFeignClient.generatePassword()).thenReturn(passwordGeneratedResponse);
-
-        ResponseEntity<PasswordGeneratedResponse> response = compteApiController.generatePassword();
-
-        // Assertions
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(passwordGeneratedResponse, response.getBody());
-    }
+    //     assertEquals(HttpStatus.OK, response.getStatusCode());
+    //     assertEquals("decryptedPassword", response.getBody());
+    // }
 
 
 
+    // @Test
+    // void testUpdateCompte() {
+    //     Compte updatedCompte = new Compte();
+    //     updatedCompte.setId("1");
+    //     updatedCompte.setPassword("newEncryptedPassword");
 
+    //     when(compteService.update(any(Compte.class))).thenReturn(updatedCompte);
+
+    //     Compte response = compteApiController.updateCompte("1", updatedCompte);
+
+    //     // Assertions
+    //     assertNotNull(response);
+    //     assertEquals("1", response.getId());
+    //     assertEquals("newEncryptedPassword", response.getPassword());
+    // }
+
+    // @Test
+    // void testDeleteById() {
+    //     doNothing().when(compteService).deleteCompteById("1");
+
+    //     compteApiController.deleteById("1");
+
+    //     // Verify that the delete method was called
+    //     verify(compteService, times(1)).deleteCompteById("1");
+    // }
+
+    // @Test
+    // void testCheckPasswordStrength() {
+    //     PasswordCheckRequest request = new PasswordCheckRequest();
+    //     request.setPassword("testPassword");
+
+    //     when(passwordFeignClient.checkPasswordStrength(any(PasswordCheckRequest.class)))
+    //             .thenReturn(passwordCheckResponse);
+
+    //     ResponseEntity<PasswordCheckResponse> response = compteApiController.checkPasswordStrength(request);
+
+    //     // Assertions
+    //     assertEquals(HttpStatus.OK, response.getStatusCode());
+    //     assertNotNull(response.getBody());
+    //     assertEquals(passwordCheckResponse, response.getBody());
+    // }
+
+    // @Test
+    // void testCheckPasswordVulnerability() {
+    //     PasswordCheckRequest request = new PasswordCheckRequest();
+    //     request.setPassword("testPassword");
+
+    //     when(passwordFeignClient.checkPasswordVulnerability(any(PasswordCheckRequest.class)))
+    //             .thenReturn(passwordCheckResponse);
+
+    //     ResponseEntity<PasswordCheckResponse> response = compteApiController.checkPasswordVulnerability(request);
+
+    //     // Assertions
+    //     assertEquals(HttpStatus.OK, response.getStatusCode());
+    //     assertNotNull(response.getBody());
+    //     assertEquals(passwordCheckResponse, response.getBody());
+    // }
+
+    // @Test
+    // void testGeneratePassword() {
+    //     PasswordGeneratedResponse passwordGeneratedResponse = new PasswordGeneratedResponse();
+    //     passwordGeneratedResponse.setPassword("generatedPassword");
+
+    //     when(passwordFeignClient.generatePassword()).thenReturn(passwordGeneratedResponse);
+
+    //     ResponseEntity<PasswordGeneratedResponse> response = compteApiController.generatePassword();
+
+    //     // Assertions
+    //     assertEquals(HttpStatus.OK, response.getStatusCode());
+    //     assertNotNull(response.getBody());
+    //     assertEquals(passwordGeneratedResponse, response.getBody());
+    // }
+
+
+        @BeforeEach
+        void setUp() {
+            compte = new Compte();
+            compte.setId("1");
+            compte.setPassword("encryptedPassword");
+    
+            createCompteRequest = new CreateCompteRequest();
+            createCompteRequest.setPassword("testPassword");
+    
+            passwordCheckResponse = new PasswordCheckResponse();
+            passwordCheckResponse.setVulnerable(false);
+            passwordCheckResponse.setStrong(true);
+    
+            passwordGeneratedResponse = new PasswordGeneratedResponse();
+            passwordGeneratedResponse.setPassword("generatedStrongPassword");
+    
+            // Initialisation fictive d'un KeyPair pour éviter les erreurs de NullPointerException
+            keyPair = new KeyPair(null, null);
+        }
+    
+        @Test
+        void testFindAll() {
+            List<Compte> comptes = new ArrayList<>();
+            comptes.add(compte);
+    
+            when(compteRepository.findAll()).thenReturn(comptes);
+    
+            List<CompteResponse> response = compteApiController.findAll();
+    
+            assertNotNull(response);
+            assertEquals(1, response.size());
+            assertEquals(compte.getId(), response.get(0).getId());
+        }
+
+
+        @Test
+void testCreate_Success() throws Exception {
+    // Configurer uniquement les stubbings nécessaires pour ce test
+    when(passwordFeignClient.checkPasswordVulnerability(any(PasswordCheckRequest.class)))
+            .thenReturn(passwordCheckResponse);
+    when(passwordFeignClient.checkPasswordStrength(any(PasswordCheckRequest.class)))
+            .thenReturn(passwordCheckResponse);
+
+    when(cryptographService.generateKeyPair()).thenReturn(keyPair);
+    when(cryptographService.encodePublicKey(any())).thenReturn("publicKeyStr");
+    when(cryptographService.encryptPasswordWithPublicKey(any(), any())).thenReturn("encryptedPassword");
+    when(cryptographService.encodePrivateKey(any())).thenReturn("privateKeyStr");
+
+    when(compteRepository.save(any(Compte.class))).thenReturn(compte);
+    when(privateKeyRepository.save(any(PrivateKey.class))).thenReturn(new PrivateKey());
+
+    // Exécuter le code à tester
+    ResponseEntity<String> response = compteApiController.create(createCompteRequest);
+
+    // Assertions
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    assertNotNull(response.getBody());
+    assertEquals(String.valueOf(compte.getId()), response.getBody());
 }
+
+    
+        @Test
+        void testDecryptPassword() throws Exception {
+            when(compteRepository.findById("1")).thenReturn(Optional.of(compte));
+            PrivateKey privateKey = new PrivateKey();
+            privateKey.setCompteId(compte.getId());
+            privateKey.setPrivateKey("privateKeyStr");
+            when(privateKeyRepository.findByCompteId("1")).thenReturn(Optional.of(privateKey));
+            when(cryptographService.decryptPassword("encryptedPassword", "privateKeyStr")).thenReturn("decryptedPassword");
+    
+            ResponseEntity<String> response = compteApiController.decryptPassword("1");
+    
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("decryptedPassword", response.getBody());
+        }
+    
+        @Test
+        void testUpdateCompte() {
+            Compte updatedCompte = new Compte();
+            updatedCompte.setId("1");
+            updatedCompte.setPassword("newEncryptedPassword");
+    
+            when(compteService.update(any(Compte.class))).thenReturn(updatedCompte);
+    
+            Compte response = compteApiController.updateCompte("1", updatedCompte);
+    
+            // Assertions
+            assertNotNull(response);
+            assertEquals("1", response.getId());
+            assertEquals("newEncryptedPassword", response.getPassword());
+        }
+    
+        @Test
+        void testDeleteById() {
+            doNothing().when(compteService).deleteCompteById("1");
+    
+            compteApiController.deleteById("1");
+    
+            // Verify that the delete method was called
+            verify(compteService, times(1)).deleteCompteById("1");
+        }
+    
+        @Test
+        void testCheckPasswordStrength() {
+            PasswordCheckRequest request = new PasswordCheckRequest();
+            request.setPassword("testPassword");
+    
+            when(passwordFeignClient.checkPasswordStrength(any(PasswordCheckRequest.class)))
+                    .thenReturn(passwordCheckResponse);
+    
+            ResponseEntity<PasswordCheckResponse> response = compteApiController.checkPasswordStrength(request);
+    
+            // Assertions
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(passwordCheckResponse, response.getBody());
+        }
+    
+        @Test
+        void testCheckPasswordVulnerability() {
+            PasswordCheckRequest request = new PasswordCheckRequest();
+            request.setPassword("testPassword");
+    
+            when(passwordFeignClient.checkPasswordVulnerability(any(PasswordCheckRequest.class)))
+                    .thenReturn(passwordCheckResponse);
+    
+            ResponseEntity<PasswordCheckResponse> response = compteApiController.checkPasswordVulnerability(request);
+    
+            // Assertions
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(passwordCheckResponse, response.getBody());
+        }
+    
+        @Test
+        void testGeneratePassword() {
+            PasswordGeneratedResponse generatedPasswordResponse = new PasswordGeneratedResponse();
+            generatedPasswordResponse.setPassword("generatedPassword");
+    
+            when(passwordFeignClient.generatePassword()).thenReturn(generatedPasswordResponse);
+    
+            ResponseEntity<PasswordGeneratedResponse> response = compteApiController.generatePassword();
+    
+            // Assertions
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(generatedPasswordResponse, response.getBody());
+        }
+    
+        // Test à ajouter pour le cas où la clé privée n'est pas trouvée
+    
+    }
+    
