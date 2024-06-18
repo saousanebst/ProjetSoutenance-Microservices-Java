@@ -76,8 +76,8 @@ private PrivateKeyRepository  privateKeyRepository;
         compte.setId("1");
         compte.setPassword("encryptedPassword");
 
-        createCompteRequest = new CreateCompteRequest();
-        createCompteRequest.setPassword("testPassword");
+        //createCompteRequest = new CreateCompteRequest();
+        //createCompteRequest.setPassword("testPassword");
 
         passwordCheckResponse = new PasswordCheckResponse();
         passwordCheckResponse.setVulnerable(false);
