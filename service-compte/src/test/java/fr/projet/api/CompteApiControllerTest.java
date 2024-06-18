@@ -126,27 +126,49 @@ private PrivateKeyRepository  privateKeyRepository;
 
     @Test
     void testCreate_Success() throws Exception {
-        // Configurer les stubs nécessaires
-        when(passwordFeignClient.checkPasswordVulnerability(any(PasswordCheckRequest.class)))
-                .thenReturn(passwordCheckResponse);
-        when(passwordFeignClient.checkPasswordStrength(any(PasswordCheckRequest.class)))
-                .thenReturn(passwordCheckResponse);
+        // Préparation des mocks pour une réponse de mot de passe non vulnérable et forte
+        CreateCompteRequest request = new CreateCompteRequest();
+        request.setPassword("StrongPassword123");
 
+        PasswordCheckResponse mockVulnerabilityResponse = new PasswordCheckResponse();
+        mockVulnerabilityResponse.setVulnerable(false);
+        when(passwordFeignClient.checkPasswordVulnerability(any())).thenReturn(mockVulnerabilityResponse);
+
+        PasswordCheckResponse mockStrengthResponse = new PasswordCheckResponse();
+        mockStrengthResponse.setStrong(true);
+        when(passwordFeignClient.checkPasswordStrength(any())).thenReturn(mockStrengthResponse);
+
+        // Générer une paire de clés RSA simulée
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
         when(cryptographService.generateKeyPair()).thenReturn(keyPair);
-        when(cryptographService.encodePublicKey(any())).thenReturn("publicKeyStr");
-        when(cryptographService.encryptPasswordWithPublicKey(any(), any())).thenReturn("encryptedPassword");
-        when(cryptographService.encodePrivateKey(any())).thenReturn("privateKeyStr");
 
-        when(compteRepository.save(any(Compte.class))).thenReturn(compte);
-        when(privateKeyRepository.save(any(PrivateKey.class))).thenReturn(new PrivateKey());
+        // Simuler les méthodes d'encodage et de chiffrement
+        when(cryptographService.encodePublicKey(any())).thenReturn("MockPublicKey");
+        when(cryptographService.encryptPasswordWithPublicKey(any(), any())).thenReturn("EncryptedPassword");
 
-        ResponseEntity<String> response = compteApiController.create(createCompteRequest);
+        Compte savedCompte = new Compte();
+        savedCompte.setId("1");
+        when(compteRepository.save(any(Compte.class))).thenAnswer(invocation -> {
+            Compte compte = invocation.getArgument(0);
+            compte.setId("1");  // Simule la génération de l'ID par la base de données
+            return compte;
+        });
 
-        // Assertions
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(String.valueOf(compte.getId()), response.getBody());
+        PrivateKey privateKey = new PrivateKey();
+        privateKey.setCompteId("1");
+        privateKey.setPrivateKey("MockPrivateKey");
+        when(cryptographService.encodePrivateKey(any())).thenReturn("MockPrivateKey");
+        when(privateKeyRepository.save(any(PrivateKey.class))).thenReturn(privateKey);
+
+        // Appel de la méthode
+        ResponseEntity<String> responseEntity = compteApiController.create(request);
+
+        // Vérifications
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        assertEquals("1", responseEntity.getBody());
     }
+    
 
     @Test
     void testDecryptPassword() throws Exception {
