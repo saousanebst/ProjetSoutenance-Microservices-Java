@@ -170,6 +170,34 @@ private PrivateKeyRepository  privateKeyRepository;
         assertEquals("1", responseEntity.getBody());
     }
     
+       @Test
+    public void testCreateWeakPassword() {
+        // Préparation des mocks pour un mot de passe faible
+        CreateCompteRequest request = new CreateCompteRequest();
+        request.setPassword("Weak123");
+
+        PasswordCheckResponse mockVulnerabilityResponse = new PasswordCheckResponse();
+        mockVulnerabilityResponse.setVulnerable(false);
+        when(passwordFeignClient.checkPasswordVulnerability(any())).thenReturn(mockVulnerabilityResponse);
+
+        PasswordCheckResponse mockStrengthResponse = new PasswordCheckResponse();
+        mockStrengthResponse.setStrong(false);
+        when(passwordFeignClient.checkPasswordStrength(any())).thenReturn(mockStrengthResponse);
+
+        PasswordGeneratedResponse generatedResponse = new PasswordGeneratedResponse();
+        generatedResponse.setPassword("GeneratedPassword123");
+        when(passwordFeignClient.generatePassword()).thenReturn(generatedResponse);
+
+        // Appel de la méthode
+        ResponseEntity<String> responseEntity = compteApiController.create(request);
+
+        // Vérifications
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertTrue(responseEntity.getBody().contains("Le mot de passe n'est pas assez fort"));
+    }
+
+    // Ajoutez d'autres tests pour d'autres cas comme mot de passe vulnérable, erreurs de services, etc.
+
 
     // @Test
     // void testDecryptPassword() throws Exception {
