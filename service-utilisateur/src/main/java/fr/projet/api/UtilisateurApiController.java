@@ -120,16 +120,33 @@ return ResponseEntity.notFound().build();
 
 
 
+// @PostMapping("/connexion")
+// 	public Utilisateur connexion(@RequestBody ConnexionDTO connexionDTO) {
+// 		Optional<Utilisateur> optUtilisateur = this.utilisateurRepository.findByEmailAndPasswordValue(connexionDTO.getEmail(), connexionDTO.getPasswordValue());
+		
+// 		if(optUtilisateur.isEmpty()) {
+// 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+// 		}
+		
+// 		return optUtilisateur.get();
+// 	}
+
 @PostMapping("/connexion")
-	public Utilisateur connexion(@RequestBody ConnexionDTO connexionDTO) {
-		Optional<Utilisateur> optUtilisateur = this.utilisateurRepository.findByEmailAndPasswordValue(connexionDTO.getEmail(), connexionDTO.getPasswordValue());
-		
-		if(optUtilisateur.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		}
-		
-		return optUtilisateur.get();
-	}
+public ResponseEntity<Object> connexion(@RequestBody ConnexionDTO connexionDTO) {
+    Optional<Utilisateur> optUtilisateur = this.utilisateurRepository.findByEmail(connexionDTO.getEmail());
+    
+    if (optUtilisateur.isEmpty()) {
+        return new ResponseEntity<>("L'email n'existe pas", HttpStatus.NOT_FOUND);
+    }
+    
+    Utilisateur utilisateur = optUtilisateur.get();
+    
+    if (!utilisateur.getPassword().equals(connexionDTO.getPasswordValue())) {
+        return new ResponseEntity<>("Le mot de passe est incorrect", HttpStatus.UNAUTHORIZED);
+    }
+    
+    return new ResponseEntity<>(utilisateur, HttpStatus.OK);
+}
 	
 
     @PostMapping("/inscription")
