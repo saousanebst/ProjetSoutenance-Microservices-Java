@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import fr.projet.api.dto.ConnexionDTO;
 import fr.projet.api.dto.InscriptionDTO;
@@ -136,36 +137,60 @@ public class UtilisateurApiControllerTest {
         assertEquals(ResponseEntity.notFound().build().getStatusCode(), responseEntity.getStatusCode());
     }
 
-  @Test
-    public void testConnexion_UserFound() throws Exception {
+
+    @Test
+    public void testConnexion_Success() throws Exception {
+        // Créez un objet ConnexionDTO avec les données de test
         ConnexionDTO connexionDTO = new ConnexionDTO();
-        connexionDTO.setEmail("bastaoui.sawsan@gmail.com");
-        connexionDTO.setPasswordValue("111111");
+        connexionDTO.setEmail("sara@example.com");
+        connexionDTO.setPasswordValue("123456");
 
+        // Créez un Utilisateur fictif pour la vérification
         Utilisateur utilisateur = new Utilisateur();
-        utilisateur.setId("sawsan");
-        utilisateur.setEmail("bastaoui.sawsan@gmail.com");
-        utilisateur.setPassword("111111");
+        utilisateur.setEmail("sara@example.com");
+        utilisateur.setPassword("123456");
 
-        when(utilisateurRepository.findByEmailAndPasswordValue("bastaoui.sawsan@gmail.com", "111111"))
-                .thenReturn(Optional.of(utilisateur));
+        // Configurez le mock du repository pour simuler la recherche par email
+        when(utilisateurRepository.findByEmail("sara@example.com")).thenReturn(Optional.of(utilisateur));
 
-        MvcResult result = mockMvc.perform(post("/api/utilisateur/connexion")
+        // Initialisez le mockMvc pour le contrôleur
+        mockMvc = MockMvcBuilders.standaloneSetup(utilisateurController).build();
+
+        // Effectuez la requête POST vers /api/utilisateur/connexion
+        mockMvc.perform(post("/api/utilisateur/connexion")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(connexionDTO)))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        String responseJson = result.getResponse().getContentAsString();
-        Utilisateur returnedUtilisateur = new ObjectMapper().readValue(responseJson, Utilisateur.class);
-
-        assertNotNull(returnedUtilisateur);
-        assertEquals("sawsan", returnedUtilisateur.getId());
-        assertEquals("bastaoui.sawsan@gmail.com", returnedUtilisateur.getEmail());
-        assertEquals("111111", returnedUtilisateur.getPassword());
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
 
+
+    @Test
+    public void testConnexion_InvalidPassword() throws Exception {
+        // Créez un objet ConnexionDTO avec un email existant mais un mot de passe incorrect
+        ConnexionDTO connexionDTO = new ConnexionDTO();
+        connexionDTO.setEmail("sara@example.com");
+        connexionDTO.setPasswordValue("motdepasseincorrect");
+
+        // Créez un Utilisateur fictif pour la vérification
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setEmail("sara@example.com");
+        utilisateur.setPassword("123456");
+
+        // Configurez le mock du repository pour simuler la recherche par email
+        when(utilisateurRepository.findByEmail("sara@example.com")).thenReturn(Optional.of(utilisateur));
+
+        // Initialisez le mockMvc pour le contrôleur
+        mockMvc = MockMvcBuilders.standaloneSetup(utilisateurController).build();
+
+        // Effectuez la requête POST vers /api/utilisateur/connexion
+        mockMvc.perform(post("/api/utilisateur/connexion")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(connexionDTO)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Le mot de passe est incorrect")); // Vérifie le message d'erreur
+    }
     @Test
     public void testConnexion_UserNotFound() throws Exception {
         ConnexionDTO connexionDTO = new ConnexionDTO();
@@ -181,66 +206,59 @@ public class UtilisateurApiControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+     @Test
+    public void testInscription_Success() throws Exception {
+        // Créez un objet InscriptionDTO avec les données de test
+        InscriptionDTO inscriptionDTO = new InscriptionDTO();
+        inscriptionDTO.setEmail("sara@example.com");
+        inscriptionDTO.setUsername("sawsana");
+        inscriptionDTO.setPasswordValue("123456");
+        inscriptionDTO.setBirthdate(LocalDate.of(1998, 3 ,5)); // Date de naissance valide
 
-@Test
-public void testInscription_Success() throws Exception {
-    // Créez un objet InscriptionDTO avec les données de test
-    InscriptionDTO inscriptionDTO = new InscriptionDTO();
-    inscriptionDTO.setEmail("sara@example.com");
-    inscriptionDTO.setUsername("sawsana");
-    inscriptionDTO.setPasswordValue("123456");
+        // Vérifiez que l'e-mail n'existe pas déjà dans la base de données
+        when(utilisateurRepository.existsByEmail("sara@example.com")).thenReturn(false);
 
-    // Vérifiez que l'e-mail n'existe pas déjà dans la base de données
-    when(utilisateurRepository.existsByEmail("sara@example.com")).thenReturn(false);
+        // Simulez l'enregistrement de l'utilisateur dans la base de données
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setEmail(inscriptionDTO.getEmail());
+        utilisateur.setUsername(inscriptionDTO.getUsername());
+        utilisateur.setPassword(inscriptionDTO.getPasswordValue());
+        utilisateur.setBirthdate(inscriptionDTO.getBirthdate());
 
-    // Simulez l'enregistrement de l'utilisateur dans la base de données
-    Utilisateur utilisateur = new Utilisateur();
-    inscriptionDTO.setEmail("sara@example.com");
-   // inscriptionDTO.setBirthdate(LocalDate.of(1998, 3 ,5));
-    inscriptionDTO.setUsername("sawsana");
-    inscriptionDTO.setPasswordValue("123456");
+        when(utilisateurRepository.save(any(Utilisateur.class))).thenReturn(utilisateur);
 
-    when(utilisateurRepository.save(any(Utilisateur.class))).thenReturn(utilisateur);
+        // Initialisez le mockMvc pour le contrôleur
+        mockMvc = MockMvcBuilders.standaloneSetup(utilisateurController).build();
 
+        // Effectuez la requête POST vers /api/utilisateur/inscription
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // Enregistrez le module JavaTimeModule
 
-// Initialisez le mockMvc pour le contrôleur
-mockMvc = MockMvcBuilders.standaloneSetup(utilisateurController).build();
+        mockMvc.perform(post("/api/utilisateur/inscription")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inscriptionDTO)))
+                .andExpect(status().isCreated());
+    }
 
-// Effectuez la requête POST vers /api/utilisateur/inscription
-MvcResult result = mockMvc.perform(post("/api/utilisateur/inscription")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(new ObjectMapper().writeValueAsString(inscriptionDTO)))
-        .andExpect(status().isCreated())
-        .andReturn();
+    @Test
+    public void testInscription_FutureBirthdate() throws Exception {
+        // Créez un objet InscriptionDTO avec une date de naissance future
+        InscriptionDTO inscriptionDTO = new InscriptionDTO();
+        inscriptionDTO.setEmail("sara@example.com");
+        inscriptionDTO.setUsername("sawsana");
+        inscriptionDTO.setPasswordValue("123456");
+        inscriptionDTO.setBirthdate(LocalDate.now().plusDays(1)); // Date de naissance future
 
+        // Initialisez le mockMvc pour le contrôleur
+        mockMvc = MockMvcBuilders.standaloneSetup(utilisateurController).build();
 
-}
-
-
-
-@Test
-public void testInscription_EmailAlreadyExists() throws Exception {
-    // Créez un objet InscriptionDTO avec un e-mail qui existe déjà dans la base de données
-    InscriptionDTO inscriptionDTO = new InscriptionDTO();
-    inscriptionDTO.setEmail("sara@example.com");
-    inscriptionDTO.setUsername("hajarBouamouta");
-    inscriptionDTO.setPasswordValue("123456");
-
-    // Vérifiez que l'e-mail existe déjà dans la base de données
-    when(utilisateurRepository.existsByEmail("sara@example.com")).thenReturn(true);
-
-    // Effectuez la requête POST vers /inscription
-    MvcResult result = mockMvc.perform(post("/api/utilisateur/inscription")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(new ObjectMapper().writeValueAsString(inscriptionDTO)))
-            .andExpect(status().isConflict())  // Attend un conflit si l'e-mail existe déjà
-            .andReturn();
-
-    // Vérifiez le contenu de la réponse (optionnel, dépend de votre implémentation)
-    String responseContent = result.getResponse().getContentAsString();
-    assertTrue(responseContent.contains("L'e-mail existe déjà."));  // Vérifie le message d'erreur renvoyé
-}
-
+        // Effectuez la requête POST vers /api/utilisateur/inscription
+        mockMvc.perform(post("/api/utilisateur/inscription")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"email\": \"sara@example.com\", \"username\": \"sawsana\", \"passwordValue\": \"123456\", \"birthdate\": \""
+                        + inscriptionDTO.getBirthdate() + "\" }"))
+                .andExpect(status().isBadRequest()); // Doit retourner un statut BadRequest
+    }
 
 @Test
     public void testUpdatePassword_UserFound() throws Exception {

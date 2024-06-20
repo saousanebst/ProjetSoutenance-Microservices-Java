@@ -1,5 +1,6 @@
 package fr.projet.api;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -157,6 +158,19 @@ public ResponseEntity<Object> connexion(@RequestBody ConnexionDTO connexionDTO) 
             return ResponseEntity.status(HttpStatus.CONFLICT).body("L'e-mail existe déjà. Veuillez en choisir un autre.");
         }
     
+
+    // Vérifie si la date de naissance est supérieure à la date du jour
+    LocalDate today = LocalDate.now();
+    if (inscriptionDTO.getBirthdate().isAfter(today)) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La date de naissance ne peut pas être dans le futur.");
+    }
+
+    // Vérifie si la date de naissance est égale à la date du jour
+    if (inscriptionDTO.getBirthdate().isEqual(today)) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La date de naissance ne peut pas être aujourd'hui.");
+    }
+
+   
         Utilisateur utilisateur = new Utilisateur();
         // Copie les propriétés de même type et nom depuis inscriptionDTO vers utilisateur
         BeanUtils.copyProperties(inscriptionDTO, utilisateur);
