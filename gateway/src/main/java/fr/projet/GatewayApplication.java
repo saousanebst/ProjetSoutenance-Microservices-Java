@@ -5,6 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 @SpringBootApplication
 public class GatewayApplication {
@@ -50,5 +54,19 @@ public class GatewayApplication {
             )
 
             .build();
+    }
+
+        @Bean
+    CorsWebFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
+        
+        // GET, POST & OPTIONS dans applyPermitDefaultValues
+        config.addAllowedMethod(HttpMethod.DELETE);
+        config.addAllowedMethod(HttpMethod.PUT);
+
+        source.registerCorsConfiguration("/**", config);
+        
+        return new CorsWebFilter(source);
     }
 }

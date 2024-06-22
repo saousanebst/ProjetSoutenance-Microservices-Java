@@ -35,7 +35,7 @@ import fr.projet.response.NoteResponse;
 import fr.projet.response.UtilisateurResponse;
 
 
-@CrossOrigin("*")
+// @CrossOrigin("*")
 @RestController
 @RequestMapping("api/utilisateur")
 public class UtilisateurApiController {

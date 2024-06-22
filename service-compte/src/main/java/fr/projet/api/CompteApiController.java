@@ -38,7 +38,7 @@ import fr.projet.service.CryptographService;
 
 @RestController
 @RequestMapping("/api/compte")
-@CrossOrigin("*")
+// @CrossOrigin("*")
 
 public class CompteApiController {
     
@@ -102,53 +102,7 @@ private PrivateKeyRepository  privateKeyRepository;
     }
 
 
-    // @PostMapping("/ajout")
-    // @ResponseStatus(HttpStatus.CREATED)
-    // public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
-    //     try {
-    //         // Vérification de la vulnérabilité du mot de passe
-    //         PasswordCheckRequest passwordCheckRequest = new PasswordCheckRequest(request.getPassword());
-    //         PasswordCheckResponse passwordCheckResponse = passwordFeignClient.checkPasswordVulnerability(passwordCheckRequest);
-    
-    //         // Si le mot de passe est vulnérable, renvoyer une réponse d'erreur
-    //         if (passwordCheckResponse.isVulnerable()) {
-    //             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est vulnérable");
-    //         }
-    
-    //         // Vérification de la force du mot de passe
-    //         PasswordCheckResponse strengthResponse = passwordFeignClient.checkPasswordStrength(passwordCheckRequest);
-    //         if (!strengthResponse.isStrong()) {
-    //             // Générer un mot de passe fort
-    //             PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
-    //             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe n'est pas assez fort. Mot de passe suggéré : " + generatedResponse.getPassword());
-    //         }
-    
-    //         // Générer une paire de clés RSA
-    //         KeyPair keyPair = cryptographService.generateKeyPair();
-    
-    //         // Chiffrer le mot de passe avec la clé publique
-    //         String publicKeyStr = cryptographService.encodePublicKey(keyPair.getPublic());
-    //         String encryptedPassword = cryptographService.encryptPasswordWithPublicKey(request.getPassword(), publicKeyStr);
-    
-    //         // Enregistrer le compte avec le mot de passe chiffré et la clé publique
-    //         Compte compte = new Compte();
-    //         BeanUtils.copyProperties(request, compte);
-    //         compte.setPassword(encryptedPassword);
-    //         compte.setPublicKey(publicKeyStr);
-    //         this.compteRepository.save(compte);
-    
-    //         // Enregistrer la clé privée associée au compte
-    //         PrivateKey privateKey = new PrivateKey();
-    //         privateKey.setCompteId(compte.getId());
-    //         privateKey.setPrivateKey(cryptographService.encodePrivateKey(keyPair.getPrivate()));
-    //         this.privateKeyRepository.save(privateKey);
-    
-    //         return ResponseEntity.status(HttpStatus.CREATED).body(compte.getId());
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création du compte : " + e.getMessage());
-    //     }
-    // }
-
+   
     @PostMapping("/ajout")
 @ResponseStatus(HttpStatus.CREATED)
 public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
