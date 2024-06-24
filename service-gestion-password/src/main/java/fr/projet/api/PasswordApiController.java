@@ -29,7 +29,7 @@ import fr.projet.service.PasswordService;
 
 @RestController
 @RequestMapping("/api/password")
-@CrossOrigin("*")
+// @CrossOrigin("*")
 public class PasswordApiController {
     
 
