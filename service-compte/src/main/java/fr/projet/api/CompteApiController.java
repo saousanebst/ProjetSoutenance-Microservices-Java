@@ -186,7 +186,7 @@ public ResponseEntity<String> decryptPassword(@RequestParam String compteId) {
 
 //update
 
-@PutMapping("/{id}")
+@PutMapping("/update/{id}")
 	public Compte updateCompte (@PathVariable String id,@RequestBody Compte compte) 
 	{
 		compte.setId(id);
