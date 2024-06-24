@@ -68,7 +68,15 @@ PrivateKeyRepository privateKeyRepository;
         return response;
     }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<Note> getNoteById(@PathVariable String id) {
+        Optional<Note> note = noteSrv.getNoteById(id);
+        if (note.isPresent()) {
+            return ResponseEntity.ok(note.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     //findallbyidUser
 
