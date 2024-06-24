@@ -33,6 +33,8 @@ import fr.projet.response.CompteResponse;
 import fr.projet.response.NoteResponse;
 
 import fr.projet.response.UtilisateurResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 
 // @CrossOrigin("*")
@@ -217,10 +219,25 @@ public void updatePassword(String idUser, String newPassword) {
 }
 
 
+// @PostMapping("/deconnexion")
+//     public ResponseEntity<Object> deconnexion() {
+//         // Logique de déconnexion ici (par exemple, invalider la session)
+
+//         // Retourne une réponse JSON vide avec le code HTTP 200 OK
+//         return ResponseEntity.ok().build();
+//     }
 
 
-
-
+@PostMapping("/deconnexion")
+public ResponseEntity<String> deconnexion(HttpServletRequest request) {
+    HttpSession session = request.getSession(false); // Récupère la session sans en créer une nouvelle
+    if (session != null) {
+        session.invalidate(); // Invalide la session actuelle
+        return ResponseEntity.ok("Utilisateur déconnecté avec succès.");
+    } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Session non trouvée.");
+    }
+}
 
 
 

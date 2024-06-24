@@ -34,7 +34,7 @@ import fr.projet.service.NoteService;
 
 @RestController
 @RequestMapping("/api/note")
-@CrossOrigin("*")
+// @CrossOrigin("*")
 public class NoteApiController {
 @Autowired
 NoteRepository noteRepository;
