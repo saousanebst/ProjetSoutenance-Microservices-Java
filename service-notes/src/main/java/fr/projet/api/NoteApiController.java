@@ -1,6 +1,7 @@
 package fr.projet.api;
 
 import java.security.KeyPair;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -109,15 +110,7 @@ PrivateKeyRepository privateKeyRepository;
 	}
 	
 
-//updatepartielle
 
-
-// @PatchMapping("/{id}")
-// 	public Note updatePartielleNote (@PathVariable String id,@RequestBody Note note) 
-// 	{
-// 		note.setId(id);
-// 		return noteSrv.updatePartiel(note);
-// 	}
 
 @PatchMapping("/{id}")
 public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note) {
@@ -126,20 +119,23 @@ public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note)
         Note existingNote = noteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Note not found with id: " + id));
 
-        // Mettre à jour les champs autorisés seulement
-        if (note.getContenu() != null) {
-            // Chiffrer le nouveau contenu avec la clé publique existante de la note
-            String encryptedContent = cryptoService.encryptNoteWithPublicKey(note.getContenu(), existingNote.getPublicKey());
-            existingNote.setContenu(encryptedContent);
-        }
-
-        // Mettre à jour les autres champs si nécessaire
+        // Mettre à jour les champs si les valeurs sont fournies dans la requête
         if (note.getNom() != null) {
             existingNote.setNom(note.getNom());
         }
         if (note.getDescription() != null) {
             existingNote.setDescription(note.getDescription());
         }
+
+        // Vérifier si le contenu a été modifié avant de le mettre à jour
+        if (note.getContenu() != null && !note.getContenu().equals(existingNote.getContenu())) {
+            // Chiffrer le nouveau contenu avec la clé publique existante de la note
+            String encryptedContent = cryptoService.encryptNoteWithPublicKey(note.getContenu(), existingNote.getPublicKey());
+            existingNote.setContenu(encryptedContent);
+        }
+
+        // // Mettre à jour la date de modification
+        // existingNote.setDateModif(LocalDateTime.now());
 
         // Sauvegarder la note mise à jour
         Note updatedNote = noteRepository.save(existingNote);
