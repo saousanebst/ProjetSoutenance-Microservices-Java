@@ -10,9 +10,17 @@ private String description;
 private LocalDate dateAjout;
 private LocalDate dateModif;
 private String contenu;
-
+private String idUser;
 public String getNom() {
     return nom;
+}
+
+public String getIdUser() {
+    return idUser;
+}
+
+public void setIdUser(String idUser) {
+    this.idUser = idUser;
 }
 
 public void setNom(String nom) {
