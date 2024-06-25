@@ -1,6 +1,7 @@
 package fr.projet.api;
 
 import java.security.KeyPair;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,8 +135,8 @@ public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note)
             existingNote.setContenu(encryptedContent);
         }
 
-        // // Mettre à jour la date de modification
-        // existingNote.setDateModif(LocalDateTime.now());
+        // Mettre à jour la date de modification
+        existingNote.setDateModif(LocalDate.now());
 
         // Sauvegarder la note mise à jour
         Note updatedNote = noteRepository.save(existingNote);
