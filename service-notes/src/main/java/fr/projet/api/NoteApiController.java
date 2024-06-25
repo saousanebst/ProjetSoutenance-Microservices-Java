@@ -32,6 +32,7 @@ import fr.projet.model.PrivateKey;
 import fr.projet.request.CreateNoteRequest;
 import fr.projet.service.CryptoService;
 import fr.projet.service.NoteService;
+import jakarta.persistence.EntityNotFoundException;
 
 
 @RestController
@@ -111,12 +112,45 @@ PrivateKeyRepository privateKeyRepository;
 //updatepartielle
 
 
+// @PatchMapping("/{id}")
+// 	public Note updatePartielleNote (@PathVariable String id,@RequestBody Note note) 
+// 	{
+// 		note.setId(id);
+// 		return noteSrv.updatePartiel(note);
+// 	}
+
 @PatchMapping("/{id}")
-	public Note updatePartielleNote (@PathVariable String id,@RequestBody Note note) 
-	{
-		note.setId(id);
-		return noteSrv.updatePartiel(note);
-	}
+public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note) {
+    try {
+        // Récupérer la note existante par ID
+        Note existingNote = noteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Note not found with id: " + id));
+
+        // Mettre à jour les champs autorisés seulement
+        if (note.getContenu() != null) {
+            // Chiffrer le nouveau contenu avec la clé publique existante de la note
+            String encryptedContent = cryptoService.encryptNoteWithPublicKey(note.getContenu(), existingNote.getPublicKey());
+            existingNote.setContenu(encryptedContent);
+        }
+
+        // Mettre à jour les autres champs si nécessaire
+        if (note.getNom() != null) {
+            existingNote.setNom(note.getNom());
+        }
+        if (note.getDescription() != null) {
+            existingNote.setDescription(note.getDescription());
+        }
+
+        // Sauvegarder la note mise à jour
+        Note updatedNote = noteRepository.save(existingNote);
+        return updatedNote;
+    } catch (Exception e) {
+        // Gérer les exceptions comme EntityNotFoundException, ou d'autres erreurs
+        // Retourner une réponse appropriée ou gérer l'erreur comme nécessaire
+        throw new RuntimeException("Failed to update note with id: " + id, e);
+    }
+}
+
 
 
 //delete	

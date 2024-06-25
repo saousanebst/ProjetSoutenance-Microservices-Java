@@ -136,6 +136,7 @@ public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
         BeanUtils.copyProperties(request, compte);
         compte.setPassword(encryptedPassword);
         compte.setPublicKey(publicKeyStr);
+        compte.setIdUser(request.getUserId());  // Associer le compte à l'utilisateur
         this.compteRepository.save(compte);
 
         // Enregistrer la clé privée associée au compte
@@ -186,7 +187,7 @@ public ResponseEntity<String> decryptPassword(@RequestParam String compteId) {
 
 //update
 
-@PutMapping("/{id}")
+@PutMapping("/update/{id}")
 	public Compte updateCompte (@PathVariable String id,@RequestBody Compte compte) 
 	{
 		compte.setId(id);
