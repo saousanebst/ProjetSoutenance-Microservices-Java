@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,7 +70,15 @@ PrivateKeyRepository privateKeyRepository;
         return response;
     }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<Note> getNoteById(@PathVariable String id) {
+        Optional<Note> note = noteSrv.getNoteById(id);
+        if (note.isPresent()) {
+            return ResponseEntity.ok(note.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     //findallbyidUser
 
@@ -117,39 +127,44 @@ PrivateKeyRepository privateKeyRepository;
 	}
 
 
+    private static final Logger logger = LoggerFactory.getLogger(NoteApiController.class);
 
-  // Create
-   // Create
-   @PostMapping("/ajout")
-   @ResponseStatus(HttpStatus.CREATED)
-   public ResponseEntity<String> create(@RequestBody CreateNoteRequest request) {
-       try {
-           // Générer une paire de clés RSA
-           KeyPair keyPair = cryptoService.generateKeyPair();
-
-           // Chiffrer le contenu de la note avec la clé publique
-           String publicKeyStr = cryptoService.encodePublicKey(keyPair.getPublic());
-           String encryptedContent = cryptoService.encryptNoteWithPublicKey(request.getContenu(), publicKeyStr);
-
-           // Enregistrer la note avec le contenu chiffré et la clé publique
-           Note note = new Note();
-           BeanUtils.copyProperties(request, note);
-           note.setContenu(encryptedContent);
-           note.setPublicKey(publicKeyStr);
-           this.noteRepository.save(note);
-
-           // Enregistrer la clé privée associée à la note
-           PrivateKey privateKeyEntity = new PrivateKey();
-           privateKeyEntity.setNoteId(note.getId());
-           privateKeyEntity.setPrivateKey(cryptoService.encodePrivateKey(keyPair.getPrivate()));
-           this.privateKeyRepository.save(privateKeyEntity);
-
-           return ResponseEntity.status(HttpStatus.CREATED).body(note.getId());
-       } catch (Exception e) {
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création de la note : " + e.getMessage());
-       }
-   }
-
+    @PostMapping("/ajout")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<String> create(@RequestBody CreateNoteRequest request) {
+        try {
+            // Vérifiez si l'ID utilisateur est présent dans la requête
+            if (request.getIdUser() == null || request.getIdUser().isEmpty()) {
+                throw new Exception("L'ID utilisateur est requis.");
+            }
+    
+            // Générer une paire de clés RSA
+            KeyPair keyPair = cryptoService.generateKeyPair();
+    
+            // Chiffrer le contenu de la note avec la clé publique
+            String publicKeyStr = cryptoService.encodePublicKey(keyPair.getPublic());
+            String encryptedContent = cryptoService.encryptNoteWithPublicKey(request.getContenu(), publicKeyStr);
+    
+            // Enregistrer la note avec le contenu chiffré, la clé publique et l'ID utilisateur
+            Note note = new Note();
+            BeanUtils.copyProperties(request, note);
+            note.setContenu(encryptedContent);
+            note.setPublicKey(publicKeyStr);
+            note.setIdUser(request.getIdUser()); // Assurez-vous que l'ID utilisateur est attribué
+            this.noteRepository.save(note);
+    
+            // Enregistrer la clé privée associée à la note
+            PrivateKey privateKeyEntity = new PrivateKey();
+            privateKeyEntity.setNoteId(note.getId());
+            privateKeyEntity.setPrivateKey(cryptoService.encodePrivateKey(keyPair.getPrivate()));
+            this.privateKeyRepository.save(privateKeyEntity);
+    
+            return ResponseEntity.status(HttpStatus.CREATED).body(note.getId().toString());
+        } catch (Exception e) {
+            logger.error("Erreur lors de la création de la note : ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création de la note : " + e.getMessage());
+        }
+    }
  
 
    @PostMapping("/decryptNote")

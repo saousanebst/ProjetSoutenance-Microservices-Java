@@ -25,15 +25,18 @@ public class NoteService {
             Note updatedNote = Note.get();
             updatedNote.setNom(note.getNom());
             updatedNote.setDescription(note.getDescription());
-            updatedNote.setDateModif(null);
-            updatedNote.setDateAjout(null);
+            updatedNote.setDateModif(note.getDateModif());
+            updatedNote.setDateAjout(note.getDateAjout());
+			updatedNote.setContenu(note.getContenu());
             return noteRepository.save(updatedNote);
         } else {
             throw new RuntimeException("Note not found with id " + note.getId());
         }
     }
 
-
+	public Optional<Note> getNoteById(String id) {
+        return noteRepository.findById(id);
+    }
 
 //delete
 

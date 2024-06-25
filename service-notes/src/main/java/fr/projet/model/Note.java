@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.hibernate.annotations.UuidGenerator;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
@@ -23,7 +24,7 @@ private LocalDate dateModif;
 private String contenu;
 private String idUser;
 
-
+@Column(length = 5000)
 private String publicKey;
 public Note(){
     

@@ -64,6 +64,7 @@ public class GatewayApplication {
         // GET, POST & OPTIONS dans applyPermitDefaultValues
         config.addAllowedMethod(HttpMethod.DELETE);
         config.addAllowedMethod(HttpMethod.PUT);
+        config.addAllowedMethod(HttpMethod.PATCH);
 
         source.registerCorsConfiguration("/**", config);
         
