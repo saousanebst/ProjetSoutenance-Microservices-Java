@@ -136,6 +136,7 @@ public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
         BeanUtils.copyProperties(request, compte);
         compte.setPassword(encryptedPassword);
         compte.setPublicKey(publicKeyStr);
+        compte.setIdUser(request.getUserId());  // Associer le compte à l'utilisateur
         this.compteRepository.save(compte);
 
         // Enregistrer la clé privée associée au compte

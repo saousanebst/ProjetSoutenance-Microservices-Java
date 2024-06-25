@@ -18,6 +18,9 @@ public class CreateCompteRequest {
     private String urlAdress;
     private String password;
 
+    private String UserId;
+    
+
     public String getPlatformName() {
         return platformName;
     }
@@ -55,8 +58,13 @@ public class CreateCompteRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-   
-
+    public String getUserId() {
+        return UserId;
+    }
+    public void setUserId(String userId) {
+        UserId = userId;
+    }
+  
 
 
 }
