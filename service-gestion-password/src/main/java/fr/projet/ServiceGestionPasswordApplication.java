@@ -17,6 +17,11 @@ public class ServiceGestionPasswordApplication {
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(ServiceGestionPasswordApplication.class, args);
 
+
+
+
+
+		
     }
 	}
 

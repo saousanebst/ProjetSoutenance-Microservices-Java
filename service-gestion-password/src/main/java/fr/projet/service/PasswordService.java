@@ -14,10 +14,16 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
+
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.projet.Request.PasswordCheckRequest;
 import fr.projet.Response.PasswordCheckResponse;
@@ -26,14 +32,19 @@ import fr.projet.model.Password;
 import fr.projet.model.PasswordResetToken;
 import fr.projet.repository.PasswordRepository;
 import fr.projet.repository.PasswordResetTokenRepository;
+import jakarta.mail.internet.MimeMessage;
+
 import org.springframework.security.crypto.bcrypt.BCrypt;
 @Service
+@Transactional
 public class PasswordService {
     
 @Autowired
 private PasswordRepository passwordRepository;
 
 
+@Autowired
+private JavaMailSender javaMailSender;
 
 
 @Autowired
@@ -79,17 +90,29 @@ private JdbcTemplate jdbcTemplate;
         }
     }
 
-
-
-//reset request 
     public void requestPasswordReset(String email) {
-        // Logique pour demander la réinitialisation du mot de passe
+        // Génération du lien de réinitialisation
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken(token, email);
+        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1)); 
         passwordResetTokenRepository.save(resetToken);
 
-        String resetLink = "https://example.com/reset-password?token=" + token;
-        System.out.println("Email sent to " + email + " with reset link: " + resetLink);
+        // Envoi de l'email réel via JavaMail
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(email);
+            helper.setSubject("Password Reset Request");
+            helper.setText("To reset your password, click the link below:\n\n" +
+                           "http://localhost:4200/reset-password?token=" + token);
+            javaMailSender.send(message);
+
+            System.out.println("Email sent to " + email + " with reset link.");
+        } catch (Exception e) {
+            // Gestion des erreurs d'envoi d'email
+            e.printStackTrace();
+            throw new RuntimeException("Failed to send password reset email.");
+        }
     }
 
 
@@ -118,6 +141,8 @@ private JdbcTemplate jdbcTemplate;
         String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
         }
+
+    
 
 
 //check 
