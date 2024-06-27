@@ -143,45 +143,81 @@ private JdbcTemplate jdbcTemplate;
     //     }
         
 
-    @Transactional
-    public void resetPassword(String token, String newPassword) {
-        // Récupérer le token de réinitialisation
-        Optional<PasswordResetToken> optionalResetToken = passwordResetTokenRepository.findByToken(token);
+    // @Transactional
+    // public void resetPassword(String token, String newPassword) {
+    //     // Récupérer le token de réinitialisation
+    //     Optional<PasswordResetToken> optionalResetToken = passwordResetTokenRepository.findByToken(token);
         
-        if (!optionalResetToken.isPresent()) {
-            throw new ResetPasswordException("Invalid token");
-        }
+    //     if (!optionalResetToken.isPresent()) {
+    //         throw new ResetPasswordException("Invalid token");
+    //     }
         
-        PasswordResetToken resetToken = optionalResetToken.get();
+    //     PasswordResetToken resetToken = optionalResetToken.get();
         
-        // Vérifier si le token a expiré
-        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ResetPasswordException("Token has expired");
-        }
+    //     // Vérifier si le token a expiré
+    //     if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+    //         throw new ResetPasswordException("Token has expired");
+    //     }
         
-        // Utiliser le Feign Client pour récupérer les informations de l'utilisateur
-        UtilisateurDto utilisateurDTO = userServiceClient.getUserByEmail(resetToken.getEmail());
+    //     // Utiliser le Feign Client pour récupérer les informations de l'utilisateur
+    //     UtilisateurDto utilisateurDTO = userServiceClient.getUserByEmail(resetToken.getEmail());
         
-        if (utilisateurDTO == null) {
-            throw new ResetPasswordException("User with email not found");
-        }
+    //     if (utilisateurDTO == null) {
+    //         throw new ResetPasswordException("User with email not found");
+    //     }
         
-        // Mettre à jour le mot de passe dans la base de données
-        Password password = new Password();
-        password.setIdUser(utilisateurDTO.getId()); // Utilisez l'identifiant récupéré depuis le service utilisateur
-        password.setPasswordValue(hashPassword(newPassword));
-        password.setDateModif(LocalDateTime.now());
+    //     // Mettre à jour le mot de passe dans la base de données
+    //     Password password = new Password();
+    //     password.setIdUser(utilisateurDTO.getId()); // Utilisez l'identifiant récupéré depuis le service utilisateur
+    //     password.setPasswordValue(hashPassword(newPassword));
+    //     password.setDateModif(LocalDateTime.now());
         
-        passwordRepository.save(password);
+    //     // passwordRepository.save(password);
         
-        // Supprimer le token de réinitialisation après utilisation
-        // passwordResetTokenRepository.delete(resetToken);
-    }
-        String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
-        }
+    //     // Supprimer le token de réinitialisation après utilisation
+    //     // passwordResetTokenRepository.delete(resetToken);
+    // }
+    //     String hashPassword(String password) {
+    //     return BCrypt.hashpw(password, BCrypt.gensalt());
+    //     }
 
+    @Transactional
+public void resetPassword(String token, String newPassword) {
+    // Récupérer le token de réinitialisation
+    Optional<PasswordResetToken> optionalResetToken = passwordResetTokenRepository.findByToken(token);
     
+    if (!optionalResetToken.isPresent()) {
+        throw new ResetPasswordException("Invalid token");
+    }
+    
+    PasswordResetToken resetToken = optionalResetToken.get();
+    
+    // Vérifier si le token a expiré
+    if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+        throw new ResetPasswordException("Token has expired");
+    }
+    
+    // Utiliser le Feign Client pour récupérer les informations de l'utilisateur
+    UtilisateurDto utilisateurDTO = userServiceClient.getUserByEmail(resetToken.getEmail());
+    
+    if (utilisateurDTO == null) {
+        throw new ResetPasswordException("User with email not found");
+    }
+    
+    // Hash le nouveau mot de passe
+    String hashedPassword = hashPassword(newPassword);
+    
+    // Mettre à jour le mot de passe dans le service utilisateur via Feign Client
+    userServiceClient.updateUserPassword(utilisateurDTO.getId(), hashedPassword);
+    
+    // Supprimer le token de réinitialisation après utilisation
+    // passwordResetTokenRepository.delete(resetToken);
+}
+
+String hashPassword(String password) {
+    return BCrypt.hashpw(password, BCrypt.gensalt());
+}
+
 
 
 //check 

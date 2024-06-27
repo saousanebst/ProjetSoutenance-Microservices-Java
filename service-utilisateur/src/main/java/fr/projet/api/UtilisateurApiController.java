@@ -74,7 +74,11 @@ private PasswordFeignClient passwordFeignClient;
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-
+    @PutMapping("/{id}/password")
+    public ResponseEntity<Void> updateUserPassword(@PathVariable String id, @RequestBody String hashedPassword) {
+        utilisateurService.updatePassword(id, hashedPassword);
+        return ResponseEntity.noContent().build();
+    }
 @GetMapping()
 public List<UtilisateurResponse> findAll() {
     List<Utilisateur> utilisateurs = this.utilisateurRepository.findAll();
