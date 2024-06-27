@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import fr.projet.api.dto.ConnexionDTO;
 import fr.projet.api.dto.InscriptionDTO;
+import fr.projet.api.dto.UtilisateurDto;
 import fr.projet.feignClient.CompteFeignClient;
 import fr.projet.feignClient.NoteFeignClient;
 import fr.projet.feignClient.PasswordFeignClient;
@@ -33,6 +34,7 @@ import fr.projet.response.CompteResponse;
 import fr.projet.response.NoteResponse;
 
 import fr.projet.response.UtilisateurResponse;
+import fr.projet.service.UtilisateurService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -50,7 +52,8 @@ public class UtilisateurApiController {
  private UtilisateurRepository utilisateurRepository;
  @Autowired
  private UtilisateurResponse utilisateurResponse;
-
+@Autowired
+UtilisateurService utilisateurService;
 @Autowired
 private CompteFeignClient compteFeignClient;
 @Autowired
@@ -58,7 +61,19 @@ private NoteFeignClient noteFeignClient;
 @Autowired
 private PasswordFeignClient passwordFeignClient;
 
-
+@GetMapping("/by-email")
+    public ResponseEntity<UtilisateurDto> getUserByEmail(@RequestParam("email") String email) {
+        Optional<Utilisateur> utilisateur = utilisateurService.findByEmail(email);
+        
+        if (utilisateur.isPresent()) {
+            UtilisateurDto utilisateurDTO = new UtilisateurDto();
+            utilisateurDTO.setEmail(utilisateur.get().getEmail());
+            utilisateurDTO.setId(utilisateur.get().getId());
+            return ResponseEntity.ok(utilisateurDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 
 @GetMapping()
 public List<UtilisateurResponse> findAll() {
