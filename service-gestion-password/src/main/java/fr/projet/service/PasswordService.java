@@ -25,11 +25,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.projet.DTO.UtilisateurDto;
+import fr.projet.OpenFeign.UserServiceClient;
 import fr.projet.Request.PasswordCheckRequest;
 import fr.projet.Response.PasswordCheckResponse;
 import fr.projet.Response.PasswordGeneratedResponse;
 import fr.projet.model.Password;
 import fr.projet.model.PasswordResetToken;
+import fr.projet.model.ResetPasswordException;
 import fr.projet.repository.PasswordRepository;
 import fr.projet.repository.PasswordResetTokenRepository;
 import jakarta.mail.internet.MimeMessage;
@@ -42,7 +45,8 @@ public class PasswordService {
 @Autowired
 private PasswordRepository passwordRepository;
 
-
+ @Autowired
+    private UserServiceClient userServiceClient;
 @Autowired
 private JavaMailSender javaMailSender;
 
@@ -116,28 +120,63 @@ private JdbcTemplate jdbcTemplate;
     }
 
 
+    // public void resetPassword(String token, String newPassword) {
+    //     Optional<PasswordResetToken> optionalResetToken = passwordResetTokenRepository.findByToken(token);
+    //     if (!optionalResetToken.isPresent()) {
+    //     throw new RuntimeException("Invalid token");
+    //     }
+        
+    //     PasswordResetToken resetToken = optionalResetToken.get();
+    //     if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+    //     throw new RuntimeException("Token has expired");
+    //     }
+        
+    //     Optional<Password> optionalPassword = passwordRepository.findById(resetToken.getEmail());
+    //     if (!optionalPassword.isPresent()) {
+    //     throw new RuntimeException("Email User not found");
+    //     }
+        
+    //     Password password = optionalPassword.get();
+    //     password.setPasswordValue(hashPassword(newPassword));
+    //     password.setDateModif(LocalDateTime.now());
+    //     passwordRepository.save(password);
+    //     }
+        
+
+    @Transactional
     public void resetPassword(String token, String newPassword) {
+        // Récupérer le token de réinitialisation
         Optional<PasswordResetToken> optionalResetToken = passwordResetTokenRepository.findByToken(token);
+        
         if (!optionalResetToken.isPresent()) {
-        throw new RuntimeException("Invalid token");
+            throw new ResetPasswordException("Invalid token");
         }
         
         PasswordResetToken resetToken = optionalResetToken.get();
+        
+        // Vérifier si le token a expiré
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-        throw new RuntimeException("Token has expired");
+            throw new ResetPasswordException("Token has expired");
         }
         
-        Optional<Password> optionalPassword = passwordRepository.findById(resetToken.getEmail());
-        if (!optionalPassword.isPresent()) {
-        throw new RuntimeException("Email User not found");
+        // Utiliser le Feign Client pour récupérer les informations de l'utilisateur
+        UtilisateurDto utilisateurDTO = userServiceClient.getUserByEmail(resetToken.getEmail());
+        
+        if (utilisateurDTO == null) {
+            throw new ResetPasswordException("User with email not found");
         }
         
-        Password password = optionalPassword.get();
+        // Mettre à jour le mot de passe dans la base de données
+        Password password = new Password();
+        password.setIdUser(utilisateurDTO.getId()); // Utilisez l'identifiant récupéré depuis le service utilisateur
         password.setPasswordValue(hashPassword(newPassword));
         password.setDateModif(LocalDateTime.now());
-        passwordRepository.save(password);
-        }
         
+        passwordRepository.save(password);
+        
+        // Supprimer le token de réinitialisation après utilisation
+        // passwordResetTokenRepository.delete(resetToken);
+    }
         String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
         }
