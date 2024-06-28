@@ -136,7 +136,7 @@ public String showResetPasswordForm(@RequestParam(name = "token") String token, 
         return passwordSrv.checkPasswordStrength(request);
     } 
 
-
+    @PostMapping("/compte/check-vulnerability")
     public PasswordCheckResponse checkPasswordVulnerability(@RequestBody PasswordCheckRequest request) {
         // Implémentez la logique pour vérifier la vulnérabilité du mot de passe dans le service
         return passwordSrv.checkPasswordVulnerability(request);

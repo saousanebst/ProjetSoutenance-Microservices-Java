@@ -13,7 +13,7 @@ public class Config {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/password");
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/stolen_passwords");
         dataSource.setUsername("postgres");
         dataSource.setPassword("root");
         return dataSource;
