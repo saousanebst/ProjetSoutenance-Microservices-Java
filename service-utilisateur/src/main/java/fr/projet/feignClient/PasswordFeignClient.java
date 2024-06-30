@@ -7,7 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import fr.projet.request.PasswordCheckRequest;
+import fr.projet.response.PasswordCheckResponse;
+import fr.projet.response.PasswordGeneratedResponse;
 
 
 @FeignClient(value = "service-gestion-password", path = "/api/password", fallback = PasswordFeignClient.Fallback.class)
@@ -26,6 +31,19 @@ public String getPasswordByUserId(@PathVariable("id") String id);
   
 @PutMapping("/utilisateur/update")
     void updatePassword(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword);
+
+  @PostMapping("/compte/check-strength")
+    PasswordCheckResponse checkPasswordStrength(@RequestBody PasswordCheckRequest request);
+
+
+    @PostMapping("/compte/check-vulnerability")
+    PasswordCheckResponse checkPasswordVulnerability(@RequestBody PasswordCheckRequest request);
+
+
+    @PostMapping("/compte/generate")
+    PasswordGeneratedResponse generatePassword();
+
+
 
 
  @Component
@@ -52,6 +70,27 @@ public String getPasswordByUserId(@PathVariable("id") String id);
         @Override
         public void updatePassword(String id, String newPassword) {
             // TODO A stub
+        }
+
+
+        @Override
+        public PasswordCheckResponse checkPasswordStrength(PasswordCheckRequest request) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'checkPasswordStrength'");
+        }
+
+
+        @Override
+        public PasswordCheckResponse checkPasswordVulnerability(PasswordCheckRequest request) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'checkPasswordVulnerability'");
+        }
+
+
+        @Override
+        public PasswordGeneratedResponse generatePassword() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'generatePassword'");
         }
     }
 
