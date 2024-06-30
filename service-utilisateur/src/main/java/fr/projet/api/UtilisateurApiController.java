@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import feign.FeignException;
 import fr.projet.api.dto.ConnexionDTO;
 import fr.projet.api.dto.InscriptionDTO;
 import fr.projet.api.dto.UtilisateurDto;
@@ -30,9 +31,11 @@ import fr.projet.feignClient.NoteFeignClient;
 import fr.projet.feignClient.PasswordFeignClient;
 import fr.projet.model.Utilisateur;
 import fr.projet.repository.UtilisateurRepository;
+import fr.projet.request.PasswordCheckRequest;
 import fr.projet.response.CompteResponse;
 import fr.projet.response.NoteResponse;
-
+import fr.projet.response.PasswordCheckResponse;
+import fr.projet.response.PasswordGeneratedResponse;
 import fr.projet.response.UtilisateurResponse;
 import fr.projet.service.UtilisateurService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -173,31 +176,52 @@ public ResponseEntity<Object> connexion(@RequestBody ConnexionDTO connexionDTO) 
 
     @PostMapping("/inscription")
     public ResponseEntity<?> inscription(@RequestBody InscriptionDTO inscriptionDTO) {
+        try {
         // Vérifie si un utilisateur avec cet e-mail existe déjà
         if (utilisateurRepository.existsByEmail(inscriptionDTO.getEmail())) {
             // Renvoie un message d'erreur si l'e-mail est déjà utilisé
             return ResponseEntity.status(HttpStatus.CONFLICT).body("L'e-mail existe déjà. Veuillez en choisir un autre.");
         }
-    
 
-    // Vérifie si la date de naissance est supérieure à la date du jour
-    LocalDate today = LocalDate.now();
-    if (inscriptionDTO.getBirthdate().isAfter(today)) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La date de naissance ne peut pas être dans le futur.");
-    }
+        // Vérifie si la date de naissance est supérieure à la date du jour
+        LocalDate today = LocalDate.now();
+        if (inscriptionDTO.getBirthdate().isAfter(today)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La date de naissance ne peut pas être dans le futur.");
+        }
 
-    // Vérifie si la date de naissance est égale à la date du jour
-    if (inscriptionDTO.getBirthdate().isEqual(today)) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La date de naissance ne peut pas être aujourd'hui.");
-    }
+        // Vérifie si la date de naissance est égale à la date du jour
+        if (inscriptionDTO.getBirthdate().isEqual(today)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La date de naissance ne peut pas être aujourd'hui.");
+        }
 
-   
+        // Vérification de la vulnérabilité du mot de passe
+        PasswordCheckRequest passwordCheckRequest = new PasswordCheckRequest(inscriptionDTO.getPassword());
+        PasswordCheckResponse vulnerabilityResponse = passwordFeignClient.checkPasswordVulnerability(passwordCheckRequest);
+        if (vulnerabilityResponse.isVulnerable()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est vulnérable");
+        }
+
+        // Vérification de la force du mot de passe
+        PasswordCheckResponse strengthResponse = passwordFeignClient.checkPasswordStrength(passwordCheckRequest);
+        if (!strengthResponse.isStrong()) {
+            // Générer un mot de passe fort si nécessaire
+            PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe n'est pas suffisamment fort. Mot de passe suggéré : " + generatedResponse.getPassword());
+        }
+
+        // Création de l'utilisateur dans le service utilisateur via Feign Client
         Utilisateur utilisateur = new Utilisateur();
-        // Copie les propriétés de même type et nom depuis inscriptionDTO vers utilisateur
         BeanUtils.copyProperties(inscriptionDTO, utilisateur);
         utilisateur = this.utilisateurRepository.save(utilisateur);
-    
+
         return ResponseEntity.status(HttpStatus.CREATED).body(utilisateur);
+    } catch (FeignException e) {
+        // Gestion des erreurs de Feign Client (par exemple, si le service est inaccessible)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'inscription : " + e.getMessage());
+    } catch (Exception e) {
+        // Gestion des autres exceptions
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'inscription : " + e.getMessage());
+    }
     }
 
 
