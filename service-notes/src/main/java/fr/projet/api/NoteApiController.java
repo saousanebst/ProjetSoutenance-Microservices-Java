@@ -33,6 +33,7 @@ import fr.projet.model.Note;
 import fr.projet.model.PrivateKey;
 import fr.projet.request.CreateNoteRequest;
 import fr.projet.service.CryptoService;
+import fr.projet.service.NoteLogService;
 import fr.projet.service.NoteService;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -46,7 +47,8 @@ NoteRepository noteRepository;
 
 @Autowired
 NoteService noteSrv;
-
+ @Autowired
+    private NoteLogService noteLogService;
 
 @Autowired
 CryptoService cryptoService;
@@ -107,7 +109,9 @@ PrivateKeyRepository privateKeyRepository;
 	public Note updateNote (@PathVariable String id,@RequestBody Note note) 
 	{
 		note.setId(id);
-		return noteSrv.update(note);
+        Note updatedNote = noteSrv.update(note);
+        noteLogService.logInfo("Updated note with ID: " + id);
+        return updatedNote;
 	}
 	
 
@@ -123,15 +127,18 @@ public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note)
         // Mettre à jour les champs si les valeurs sont fournies dans la requête
         if (note.getNom() != null) {
             existingNote.setNom(note.getNom());
+            logger.info("Updated nom of note with ID: {}", id);
         }
         if (note.getDescription() != null) {
             existingNote.setDescription(note.getDescription());
+            noteLogService.logInfo("Updated description of note with ID: {}"  +id);
         }
 
         // Vérifier si le contenu a été modifié avant de le mettre à jour
         if (note.getContenu() != null && !note.getContenu().equals(existingNote.getContenu())) {
             // Chiffrer le nouveau contenu avec la clé publique existante de la note
             String encryptedContent = cryptoService.encryptNoteWithPublicKey(note.getContenu(), existingNote.getPublicKey());
+            noteLogService.logInfo("Updated content of note with ID:" + id);
             existingNote.setContenu(encryptedContent);
         }
 
@@ -140,23 +147,35 @@ public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note)
 
         // Sauvegarder la note mise à jour
         Note updatedNote = noteRepository.save(existingNote);
+        noteLogService.logInfo("Partially updated note with ID: " + id);
         return updatedNote;
     } catch (Exception e) {
         // Gérer les exceptions comme EntityNotFoundException, ou d'autres erreurs
         // Retourner une réponse appropriée ou gérer l'erreur comme nécessaire
+        noteLogService.logError("Failed to partially update note with ID: " + id + ". Reason: " + e.getMessage());
         throw new RuntimeException("Failed to update note with id: " + id, e);
     }
 }
 
 
 
-//delete	
-	@DeleteMapping("/{id}")
-	public void deleteById(@PathVariable String id) 
-	{
-		noteSrv.deleteNoteById(id);
-	}
-
+// //delete	
+// 	@DeleteMapping("/{id}")
+// 	public void deleteById(@PathVariable String id) 
+// 	{
+// 		noteSrv.deleteNoteById(id);
+// 	}
+@DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable String id) {
+        try {
+            noteSrv.deleteNoteById(id);
+            noteLogService.logInfo("Deleted note with ID: " + id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException ex) {
+            noteLogService.logError("Failed to delete note with ID: " + id + ". Reason: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(NoteApiController.class);
 
@@ -189,9 +208,10 @@ public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note)
             privateKeyEntity.setNoteId(note.getId());
             privateKeyEntity.setPrivateKey(cryptoService.encodePrivateKey(keyPair.getPrivate()));
             this.privateKeyRepository.save(privateKeyEntity);
-    
+            noteLogService.logInfo("Created note with ID: " + note.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(note.getId().toString());
         } catch (Exception e) {
+            noteLogService.logError("Failed to create note. Reason: " + e.getMessage());
             logger.error("Erreur lors de la création de la note : ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création de la note : " + e.getMessage());
         }

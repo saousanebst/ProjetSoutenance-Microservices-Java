@@ -33,6 +33,7 @@ import fr.projet.response.PasswordCheckResponse;
 import fr.projet.response.PasswordGeneratedResponse;
 import fr.projet.service.CompteSrv;
 import fr.projet.service.CryptographService;
+import fr.projet.service.LogService;
 
 @RestController
 @RequestMapping("/api/compte")
@@ -181,22 +182,25 @@ public ResponseEntity<String> decryptPassword(@RequestParam String compteId) {
 
 
 
+    @Autowired
+    private LogService logService;
 
 
 //update
 
 @PutMapping("/update/{id}")
 	public Compte updateCompte (@PathVariable String id,@RequestBody Compte compte) 
-	{
-		compte.setId(id);
-		return compteService.update(compte);
-	}
-	
+	{ compte.setId(id); 
+        Compte updatedCompte = compteService.update(compte); 
+        logService.logInfo("Updated account with ID: " + id); 
+        return updatedCompte; 
+    }
 //delete	
 	@DeleteMapping("/{id}")
 	public void deleteById(@PathVariable String id) 
 	{
-		compteService.deleteCompteById(id);
+        compteService.deleteCompteById(id); // Suppression du compte par ID
+        logService.logInfo("Deleted account with ID: " + id);
 	}
 
 //check strength and vulnerability
