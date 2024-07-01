@@ -88,37 +88,56 @@ public ResponseEntity<String> requestPasswordReset(@RequestParam String email) {
     }
 }
 
-// @PostMapping("/utilisateur/reset")
-// public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-//     passwordSrv.resetPassword(token, newPassword);
-//     return ResponseEntity.ok("Password has been reset.");
-// }
 
+// @PostMapping("/utilisateur/reset")
+//     public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+//         try {
+//             passwordSrv.resetPassword(token, newPassword); // Appel au service pour réinitialiser le mot de passe
+//             return ResponseEntity.ok("Password has been reset.");
+//         } catch (Exception e) {
+//             // Log et renvoyer une erreur en cas d'échec
+//             e.printStackTrace();
+//             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                                  .body("Failed to reset password.");
+//         }
+//     }
+    
 @PostMapping("/utilisateur/reset")
-    public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-        try {
+public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+    try {
+        // Vérifier la force du nouveau mot de passe
+        PasswordCheckRequest passwordRequest = new PasswordCheckRequest(newPassword);
+        
+        // Vérifier la force du mot de passe
+        PasswordCheckResponse strengthResponse = passwordSrv.checkPasswordStrength(passwordRequest);
+
+        // Vérifier la vulnérabilité du mot de passe
+        PasswordCheckResponse vulnerabilityResponse = passwordSrv.checkPasswordVulnerability(passwordRequest);
+
+        // Si le mot de passe est fort et non vulnérable, réinitialiser le mot de passe
+        if (strengthResponse.isStrong() && !vulnerabilityResponse.isVulnerable()) {
             passwordSrv.resetPassword(token, newPassword); // Appel au service pour réinitialiser le mot de passe
             return ResponseEntity.ok("Password has been reset.");
-        } catch (Exception e) {
-            // Log et renvoyer une erreur en cas d'échec
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Failed to reset password.");
-        }
-    }
-    
-// @PostMapping("/utilisateur/reset")
-// public ResponseEntity<String> resetPassword(@RequestParam(name = "token") String token,
-//                                             @RequestParam(name = "newPassword") String newPassword) {
-//     try {
-//         passwordSrv.resetPassword(token, newPassword);
-//         return ResponseEntity.ok("Mot de passe réinitialisé avec succès.");
-//     } catch (Exception e) {
-//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                              .body("Erreur lors de la réinitialisation du mot de passe : " + e.getMessage());
-//     }
-// }
+        } else {
+            // Construction du message d'erreur détaillé
+            StringBuilder errorMessage = new StringBuilder("Le nouveau mot de passe ne répond pas aux critères requis:\n");
+            if (!strengthResponse.isStrong()) {
+                errorMessage.append("- Le mot de passe n'est pas assez fort.\n");
+            }
+            if (vulnerabilityResponse.isVulnerable()) {
+                errorMessage.append("- Le mot de passe est vulnérable.\n");
+            }
 
+            // Retourner une réponse indiquant les raisons de l'échec
+            return ResponseEntity.badRequest().body(errorMessage.toString());
+        }
+    } catch (Exception e) {
+        // Log et renvoyer une erreur en cas d'échec
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("Failed to reset password.");
+    }
+}
 
 @GetMapping("/reset-password")
 public String showResetPasswordForm(@RequestParam(name = "token") String token, Model model) {
