@@ -40,4 +40,7 @@ public class LogService {
     public void logError(String message) {
         sendLog("ERROR", message);
     }
+    public void logWarn(String message) {
+        sendLog("WARN", message);
+    }
 }

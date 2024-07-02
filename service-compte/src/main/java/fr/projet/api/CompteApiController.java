@@ -56,10 +56,15 @@ private CryptographService cryptographService;
 
 
 @Autowired
+private LogService logService;
+
+@Autowired
 private PrivateKeyRepository  privateKeyRepository;
 //findAll
 @GetMapping
     public List<CompteResponse> findAll() {
+        logService.logInfo("Fetching all comptes");
+
         List<Compte> comptes = this.compteRepository.findAll();
         List<CompteResponse> response = new ArrayList<>();
 
@@ -72,7 +77,8 @@ private PrivateKeyRepository  privateKeyRepository;
 
             }
         
-        
+            logService.logInfo("Fetched " + response.size() + " comptes");
+
         return response;
     }
 
@@ -80,6 +86,8 @@ private PrivateKeyRepository  privateKeyRepository;
  // findAll by userId
     @GetMapping("/utilisateur/{idUser}")
     public List<CompteResponse> getComptesByUtilisateurId(@PathVariable String idUser) {
+        logService.logInfo("Fetching comptes for utilisateur with ID " + idUser);
+
         List<Compte> comptes = compteRepository.findAllByIdUser(idUser);
         List<CompteResponse> response = new ArrayList<>();
 
@@ -88,6 +96,7 @@ private PrivateKeyRepository  privateKeyRepository;
             BeanUtils.copyProperties(compte, compteResponse);
             response.add(compteResponse);
         }
+        logService.logInfo("Fetched " + response.size() + " comptes for utilisateur with ID " + idUser);
 
         return response;
     }
@@ -105,6 +114,8 @@ private PrivateKeyRepository  privateKeyRepository;
     @PostMapping("/ajout")
 @ResponseStatus(HttpStatus.CREATED)
 public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
+    logService.logInfo("Received request to create account for user ID: " + request.getUserId());
+
     try {
         // Vérification de la vulnérabilité du mot de passe
         PasswordCheckRequest passwordCheckRequest = new PasswordCheckRequest(request.getPassword());
@@ -112,6 +123,8 @@ public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
 
         // Si le mot de passe est vulnérable, renvoyer une réponse d'erreur
         if (passwordCheckResponse.isVulnerable()) {
+            logService.logWarn("Password is vulnerable for user ID: " + request.getUserId());
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe est vulnérable");
         }
 
@@ -120,6 +133,8 @@ public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
         if (!strengthResponse.isStrong()) {
             // Générer un mot de passe fort
             PasswordGeneratedResponse generatedResponse = passwordFeignClient.generatePassword();
+            logService.logWarn("Password is not strong enough for user ID: " + request.getUserId() + ". Suggested password: " + generatedResponse.getPassword());
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe n'est pas assez fort. Mot de passe suggéré : " + generatedResponse.getPassword());
         }
 
@@ -143,11 +158,16 @@ public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
         privateKey.setCompteId(compte.getId());
         privateKey.setPrivateKey(cryptographService.encodePrivateKey(keyPair.getPrivate()));
         this.privateKeyRepository.save(privateKey);
+        logService.logInfo("Successfully created account with ID: " + compte.getId() + " for user ID: " + request.getUserId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(compte.getId());
     } catch (NoSuchElementException e) {
+        logService.logError("Private key not found for user ID: " + request.getUserId());
+
         return ResponseEntity.status(HttpStatus.OK).body("Clé privée non trouvée pour ce compte");
     } catch (Exception e) {
+        logService.logError("Error creating account for user ID: " + request.getUserId() + ". Error: " + e.getMessage());
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création du compte : " + e.getMessage());
     }
 }
@@ -156,16 +176,22 @@ public ResponseEntity<String> create(@RequestBody CreateCompteRequest request) {
 
         @PostMapping("/decryptPassword")
 public ResponseEntity<String> decryptPassword(@RequestParam String compteId) {
+    logService.logInfo("Received request to decrypt password for account ID: " + compteId);
+
     try {
         // Récupérer les informations du compte et la clé privée
         Optional<Compte> compteOptional = compteRepository.findById(compteId);
         if (!compteOptional.isPresent()) {
+            logService.logWarn("Account not found for ID: " + compteId);
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Compte non trouvé");
         }
 
         Compte compte = compteOptional.get();
         Optional<PrivateKey> privateKeyOptional = privateKeyRepository.findByCompteId(compteId);
         if (!privateKeyOptional.isPresent()) {
+            logService.logError("Private key not found for account ID: " + compteId);
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Clé privée non trouvée pour ce compte");
         }
 
@@ -173,17 +199,16 @@ public ResponseEntity<String> decryptPassword(@RequestParam String compteId) {
         String encryptedPassword = compte.getPassword();
         String privateKeyStr = privateKeyOptional.get().getPrivateKey();
         String decryptedPassword = cryptographService.decryptPassword(encryptedPassword, privateKeyStr);
+        logService.logInfo("Successfully decrypted password for account ID: " + compteId);
 
         return ResponseEntity.ok(decryptedPassword);
     } catch (Exception e) {
+        logService.logError("Error decrypting password for account ID: " + compteId + ". Error: " + e.getMessage());
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors du déchiffrement du mot de passe : " + e.getMessage());
     }
 }
 
-
-
-    @Autowired
-    private LogService logService;
 
 
 //update
@@ -205,25 +230,44 @@ public ResponseEntity<String> decryptPassword(@RequestParam String compteId) {
 
 //check strength and vulnerability
  
-    @PostMapping("/check-strength")
-    public ResponseEntity<PasswordCheckResponse> checkPasswordStrength(@RequestBody PasswordCheckRequest request) {
+@PostMapping("/check-strength")
+public ResponseEntity<PasswordCheckResponse> checkPasswordStrength(@RequestBody PasswordCheckRequest request) {
+    logService.logInfo("Received request to check password strength for password: " + request.getPassword());
+    try {
         PasswordCheckResponse response = passwordFeignClient.checkPasswordStrength(request);
+        logService.logInfo("Password strength checked successfully");
         return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        logService.logError("Error checking password strength: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+}
 
-    @PostMapping("/check-vulnerability")
-    public ResponseEntity<PasswordCheckResponse> checkPasswordVulnerability(@RequestBody PasswordCheckRequest request) {
+@PostMapping("/check-vulnerability")
+public ResponseEntity<PasswordCheckResponse> checkPasswordVulnerability(@RequestBody PasswordCheckRequest request) {
+    logService.logInfo("Received request to check password vulnerability for password: " + request.getPassword());
+    try {
         PasswordCheckResponse response = passwordFeignClient.checkPasswordVulnerability(request);
+        logService.logInfo("Password vulnerability checked successfully");
         return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        logService.logError("Error checking password vulnerability: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+}
 
-    //generate
-
-    @PostMapping("/generate")
-    public ResponseEntity<PasswordGeneratedResponse> generatePassword() {
+@PostMapping("/generate")
+public ResponseEntity<PasswordGeneratedResponse> generatePassword() {
+    logService.logInfo("Received request to generate a password");
+    try {
         PasswordGeneratedResponse response = passwordFeignClient.generatePassword();
+        logService.logInfo("Password generated successfully");
         return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        logService.logError("Error generating password: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+}
 
 
 
