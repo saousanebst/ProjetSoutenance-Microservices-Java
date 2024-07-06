@@ -2,8 +2,8 @@ package fr.projet.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +36,8 @@ import fr.projet.response.PasswordCheckResponse;
 import fr.projet.response.PasswordGeneratedResponse;
 import fr.projet.service.CompteSrv;
 import fr.projet.service.CryptographService;
+import fr.projet.service.LogService;
+
 import org.springframework.http.HttpStatus;
 
 
@@ -58,7 +59,8 @@ private CryptographService cryptographService;
 
 @Mock
 private PrivateKeyRepository  privateKeyRepository;
-
+ @Mock
+    private LogService logService; 
 @InjectMocks
     private CompteApiController compteApiController;
 
@@ -69,7 +71,6 @@ private PrivateKeyRepository  privateKeyRepository;
     private CreateCompteRequest createCompteRequest;
     private PasswordCheckResponse passwordCheckResponse;
     private PasswordGeneratedResponse passwordGeneratedResponse;
-    private KeyPair keyPair;
     
     @BeforeEach
     void setUp() throws Exception {
@@ -93,12 +94,13 @@ private PrivateKeyRepository  privateKeyRepository;
         comptes.add(compte);
 
         when(compteRepository.findAll()).thenReturn(comptes);
-
+          doNothing().when(logService).logInfo(anyString());
         List<CompteResponse> response = compteApiController.findAll();
 
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals(compte.getId(), response.get(0).getId());
+        verify(logService, times(2)).logInfo(anyString());
     }
 
     @Test
@@ -107,12 +109,15 @@ private PrivateKeyRepository  privateKeyRepository;
         comptes.add(compte);
 
         when(compteRepository.findAllByIdUser("1")).thenReturn(comptes);
+        doNothing().when(logService).logInfo(anyString());
 
         List<CompteResponse> response = compteApiController.getComptesByUtilisateurId("1");
 
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals(compte.getId(), response.get(0).getId());
+                verify(logService, times(2)).logInfo(anyString());
+
     }
 
     @Test
@@ -161,6 +166,7 @@ private PrivateKeyRepository  privateKeyRepository;
         privateKey.setPrivateKey("MockPrivateKey");
         when(cryptographService.encodePrivateKey(any())).thenReturn("MockPrivateKey");
         when(privateKeyRepository.save(any(PrivateKey.class))).thenReturn(privateKey);
+        doNothing().when(logService).logInfo(anyString());
 
         // Appel de la méthode
         ResponseEntity<String> responseEntity = compteApiController.create(request);
@@ -168,6 +174,8 @@ private PrivateKeyRepository  privateKeyRepository;
         // Vérifications
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals("1", responseEntity.getBody());
+        verify(logService, times(2)).logInfo(anyString());
+
     }
     
 
@@ -179,39 +187,49 @@ private PrivateKeyRepository  privateKeyRepository;
         privateKey.setPrivateKey("privateKeyStr");
         when(privateKeyRepository.findByCompteId("1")).thenReturn(Optional.of(privateKey));
         when(cryptographService.decryptPassword("encryptedPassword", "privateKeyStr")).thenReturn("decryptedPassword");
+        doNothing().when(logService).logInfo(anyString());
 
         ResponseEntity<String> response = compteApiController.decryptPassword("1");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("decryptedPassword", response.getBody());
+        verify(logService, times(2)).logInfo(anyString());
+
     }
 
 
 
     @Test
     void testUpdateCompte() {
-        Compte updatedCompte = new Compte();
-        updatedCompte.setId("1");
-        updatedCompte.setPassword("newEncryptedPassword");
+    String id = "1";
+    Compte updatedCompteRequest = new Compte();
+    updatedCompteRequest.setPassword("newEncryptedPassword");
 
-        when(compteService.update(any(Compte.class))).thenReturn(updatedCompte);
+    when(compteService.update(any(Compte.class))).thenAnswer(invocation -> {
+        Compte compteToUpdate = invocation.getArgument(0);
+        compteToUpdate.setId(id);
+        return compteToUpdate;
+    });
 
-        Compte response = compteApiController.updateCompte("1", updatedCompte);
+    Compte response = compteApiController.updateCompte(id, updatedCompteRequest);
 
-        // Assertions
-        assertNotNull(response);
-        assertEquals("1", response.getId());
-        assertEquals("newEncryptedPassword", response.getPassword());
+    assertNotNull(response);
+    assertEquals(id, response.getId());
+    assertEquals("newEncryptedPassword", response.getPassword());
+
+    verify(logService, times(1)).logInfo("Updated account with ID: " + id);
+
     }
 
     @Test
     void testDeleteById() {
         doNothing().when(compteService).deleteCompteById("1");
-
+        doNothing().when(logService).logInfo(anyString());
         compteApiController.deleteById("1");
 
         // Verify that the delete method was called
         verify(compteService, times(1)).deleteCompteById("1");
+        verify(logService, times(1)).logInfo(anyString());
     }
 
     @Test
@@ -221,13 +239,14 @@ private PrivateKeyRepository  privateKeyRepository;
 
         when(passwordFeignClient.checkPasswordStrength(any(PasswordCheckRequest.class)))
                 .thenReturn(passwordCheckResponse);
-
+        doNothing().when(logService).logInfo(anyString());
         ResponseEntity<PasswordCheckResponse> response = compteApiController.checkPasswordStrength(request);
 
         // Assertions
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(passwordCheckResponse, response.getBody());
+        verify(logService, times(2)).logInfo(anyString());
     }
 
     @Test
@@ -237,13 +256,15 @@ private PrivateKeyRepository  privateKeyRepository;
 
         when(passwordFeignClient.checkPasswordVulnerability(any(PasswordCheckRequest.class)))
                 .thenReturn(passwordCheckResponse);
-
+        doNothing().when(logService).logInfo(anyString());
         ResponseEntity<PasswordCheckResponse> response = compteApiController.checkPasswordVulnerability(request);
 
         // Assertions
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(passwordCheckResponse, response.getBody());
+        verify(logService, times(2)).logInfo(anyString());
+
     }
 
     @Test
@@ -252,6 +273,7 @@ private PrivateKeyRepository  privateKeyRepository;
         passwordGeneratedResponse.setPassword("generatedPassword");
 
         when(passwordFeignClient.generatePassword()).thenReturn(passwordGeneratedResponse);
+        doNothing().when(logService).logInfo(anyString());
 
         ResponseEntity<PasswordGeneratedResponse> response = compteApiController.generatePassword();
 
@@ -259,6 +281,8 @@ private PrivateKeyRepository  privateKeyRepository;
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(passwordGeneratedResponse, response.getBody());
+        verify(logService, times(2)).logInfo(anyString());
+
     }
 
 

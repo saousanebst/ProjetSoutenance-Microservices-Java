@@ -2,11 +2,13 @@ package fr.projet.api.dto;
 
 import java.time.LocalDate;
 
+
 public class InscriptionDTO {
     
 private String email;
 private String passwordValue;
 private String username;
+
 private LocalDate birthdate; 
 
 public InscriptionDTO() {
