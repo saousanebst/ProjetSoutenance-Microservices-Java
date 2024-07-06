@@ -89,19 +89,7 @@ public ResponseEntity<String> requestPasswordReset(@RequestParam String email) {
 }
 
 
-// @PostMapping("/utilisateur/reset")
-//     public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-//         try {
-//             passwordSrv.resetPassword(token, newPassword); // Appel au service pour réinitialiser le mot de passe
-//             return ResponseEntity.ok("Password has been reset.");
-//         } catch (Exception e) {
-//             // Log et renvoyer une erreur en cas d'échec
-//             e.printStackTrace();
-//             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                                  .body("Failed to reset password.");
-//         }
-//     }
-    
+
 @PostMapping("/utilisateur/reset")
 public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
     try {
