@@ -1,5 +1,6 @@
 package fr.projet.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -11,6 +12,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -23,20 +26,27 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.mail.javamail.JavaMailSender;
+
 import org.springframework.test.util.ReflectionTestUtils;
 
+import fr.projet.DTO.UtilisateurDto;
+import fr.projet.OpenFeign.UserServiceClient;
 import fr.projet.Request.PasswordCheckRequest;
 import fr.projet.Response.PasswordCheckResponse;
 import fr.projet.Response.PasswordGeneratedResponse;
 import fr.projet.model.Password;
 import fr.projet.model.PasswordResetToken;
+import fr.projet.model.ResetPasswordException;
 import fr.projet.repository.PasswordRepository;
 import fr.projet.repository.PasswordResetTokenRepository;
+
 
 @ExtendWith(MockitoExtension.class) // Intégration de Mockito avec JUnit 5
 public class PasswordServiceTest {
@@ -50,7 +60,10 @@ public class PasswordServiceTest {
     @InjectMocks
     private PasswordService passwordService;
 
-
+    @Mock
+    private UserServiceClient userServiceClient;
+@Mock
+private JavaMailSender javaMailSender;
     @Mock
     private JdbcTemplate jdbcTemplate;
     @Test
@@ -78,27 +91,56 @@ public class PasswordServiceTest {
         assertEquals("testPasswordId", createdPassword.getId());
         assertNotNull(createdPassword.getDateAjout());
     }   
-
-
- @Test
-    public void testRequestPasswordReset_Success() {
+   @Test
+    public void testResetPassword_Success() {
         // Données de test
-        String email = "hajar@example.com";
+        String token = "valid-token";
+        String newPassword = "StrongPassword123@";
+        String email = "test@example.com";
 
-        // Mock du comportement de passwordResetTokenRepository.save()
-        when(passwordResetTokenRepository.save(any(PasswordResetToken.class))).thenAnswer(invocation -> {
-            PasswordResetToken resetToken = invocation.getArgument(0);
-            resetToken.setId("1L"); // Simule l'attribution d'un ID par le repository
-            return resetToken;
-        });
+        // Mock du comportement de passwordResetTokenRepository.findByToken()
+        PasswordResetToken resetToken = new PasswordResetToken(token, email);
+        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
+        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+
+        // Mock du comportement de userServiceClient.getUserByEmail()
+        when(userServiceClient.getUserByEmail(email)).thenReturn(new UtilisateurDto( "test@example.com","sdxs1245"));
 
         // Appel de la méthode à tester
-        passwordService.requestPasswordReset(email);
+        assertDoesNotThrow(() -> passwordService.resetPassword(token, newPassword));
 
-        // Vérification que passwordResetTokenRepository.save() a été appelé une fois avec les bonnes données
-        verify(passwordResetTokenRepository, times(1)).save(any(PasswordResetToken.class));
+        // Vérifications
+        verify(passwordResetTokenRepository, times(1)).findByToken(token);
+        verify(userServiceClient, times(1)).getUserByEmail(email);
+        verify(userServiceClient, times(1)).updateUserPassword(eq("sdxs1245"), anyString());
     }
+@Test
+    public void testResetPassword_UserNotFound() {
+        // Données de test
+        String token = "valid-token";
+        String newPassword = "StrongPassword123@";
+        String email = "test@example.com";
 
+        // Mock du comportement de passwordResetTokenRepository.findByToken()
+        PasswordResetToken resetToken = new PasswordResetToken(token, email);
+        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
+        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+
+        // Mock du comportement de userServiceClient.getUserByEmail()
+        when(userServiceClient.getUserByEmail(email)).thenReturn(null); // Utilisateur non trouvé
+
+        // Vérification que ResetPasswordException est levée avec le message approprié
+        ResetPasswordException exception = assertThrows(ResetPasswordException.class,
+                () -> passwordService.resetPassword(token, newPassword));
+        assertEquals("User with email not found", exception.getMessage());
+
+        // Vérifications
+        verify(passwordResetTokenRepository, times(1)).findByToken(token);
+        verify(userServiceClient, times(1)).getUserByEmail(email);
+        verify(userServiceClient, never()).updateUserPassword(anyString(), anyString());
+   
+    }
+   
     @Test
     public void testGetPasswordByUserId_PasswordFound() throws Exception {
         // Données de test
@@ -196,43 +238,21 @@ public class PasswordServiceTest {
         // Vérification du message d'erreur
         assertEquals("Token has expired", exception.getMessage());
     }
-
-
-@Test
-    public void testResetPassword_Success() {
+    @Test
+    public void testGetPasswordByUserId_UserNotExists() {
         // Données de test
-        String token = "validToken";
-        String newPassword = "9mxW1y/bk72";
-        String userEmail = "taest@gmail.com";
-
-        // Création d'un PasswordResetToken valide
-        PasswordResetToken validResetToken = new PasswordResetToken(token, userEmail);
-
-        // Création d'un Password existant
-        Password existingPassword = new Password();
-        existingPassword.setPasswordValue("finish");
-        existingPassword.setDateModif(LocalDateTime.now().minusDays(1)); // Date de modification d'il y a un jour
-
-        // Mock du comportement de findByToken pour retourner le token valide
-        when(passwordResetTokenRepository.findByToken(eq(token))).thenReturn(Optional.of(validResetToken));
-
-        // Mock du comportement de findById pour retourner le Password existant
-        when(passwordRepository.findById(eq(userEmail))).thenReturn(Optional.of(existingPassword));
+        String userId = "2";
+        
+        // Mock du comportement de passwordRepository.findByidUser()
+        when(passwordRepository.findByidUser(userId)).thenReturn(null);
 
         // Appel de la méthode à tester
-        passwordService.resetPassword(token, newPassword);
+        String actualPassword = passwordService.getPasswordByUserId(userId);
 
-        // Vérification que le mot de passe a été mis à jour correctement
-        //assertEquals(newPassword, existingPassword.getPasswordValue());
-      //  assertTrue(existingPassword.getDateModif().isAfter(existingPassword.getDateAjout())); // Vérifie que dateModif > dateAjout
+        // Vérifications
+        assertNull(actualPassword);
+        verify(passwordRepository, times(1)).findByidUser(userId);
     }
-
-    // Méthode de hashPassword pour le test
-    private String hashPassword(String password) {
-        // Implémentation factice pour le test
-        return "hashedPassword";
-    }
-
 
     @Test
     public void testCheckPasswordStrength_PasswordStrong() {

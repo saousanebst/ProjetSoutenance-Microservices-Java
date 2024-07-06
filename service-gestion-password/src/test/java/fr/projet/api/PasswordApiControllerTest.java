@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -132,28 +135,43 @@ public class PasswordApiControllerTest {
                 .andExpect(status().isOk()) // Vérifier le statut HTTP 200 (OK)
                 .andExpect(content().string("Password reset email has been sent.")); // Vérifier le contenu de la réponse
     }
-
     @Test
     public void testResetPassword_Success() throws Exception {
-        // Paramètres de test
-        String token = "testToken";
-        String newPassword = "newPassword123";
+        String token = "valid-token";
+        String newPassword = "StrongPassword123@";
 
-     
- // Mock du service pour la méthode resetPassword avec doNothing
- doNothing().when(passwordSrv).resetPassword(token, newPassword);
+        // Mocking successful password reset
+        when(passwordSrv.checkPasswordStrength(any())).thenReturn(new PasswordCheckResponse(true, false, ""));
+        when(passwordSrv.checkPasswordVulnerability(any())).thenReturn(new PasswordCheckResponse(true, false, ""));
+        doNothing().when(passwordSrv).resetPassword(eq(token), eq(newPassword));
 
- // Effectuer une requête POST vers /utilisateur/reset
- mockMvc.perform(post("/api/password/utilisateur/reset")
-         .param("token", token)
-         .param("newPassword", newPassword)
-         .contentType(MediaType.APPLICATION_JSON))
-         .andExpect(status().isOk()) // Vérifier le statut HTTP 200 (OK)
-         .andExpect(content().string("Password has been reset.")); // Vérifier le contenu de la réponse
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/password/utilisateur/reset")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("token", token)
+                .param("newPassword", newPassword))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Password has been reset."));
 
- // Vérifie que la méthode resetPassword a été appelée une fois avec les bons paramètres
- verify(passwordSrv, times(1)).resetPassword(token, newPassword);
-}
+        verify(passwordSrv, times(1)).resetPassword(eq(token), eq(newPassword));
+    }
+     @Test
+    public void testResetPassword_WeakPassword() throws Exception {
+        String token = "valid-token";
+        String newPassword = "weak";
+
+        // Mocking weak password scenario
+        when(passwordSrv.checkPasswordStrength(any())).thenReturn(new PasswordCheckResponse(false, false, ""));
+        when(passwordSrv.checkPasswordVulnerability(any())).thenReturn(new PasswordCheckResponse(false, false, ""));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/password/utilisateur/reset")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("token", token)
+                .param("newPassword", newPassword))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Le nouveau mot de passe ne répond pas aux critères requis:\n- Le mot de passe n'est pas assez fort.\n"));
+
+        verify(passwordSrv, never()).resetPassword(anyString(), anyString());
+    }
 
 @Test
     public void testGeneratePassword_Success() throws Exception {

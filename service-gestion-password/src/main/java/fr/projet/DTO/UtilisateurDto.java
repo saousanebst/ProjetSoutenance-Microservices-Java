@@ -15,6 +15,12 @@ public class UtilisateurDto {
     public void setId(String id) {
         this.id = id;
     }
+    public UtilisateurDto(String email, String id) {
+        this.email = email;
+        this.id = id;
+    }
+    public UtilisateurDto() {
+    }
 
 
 
