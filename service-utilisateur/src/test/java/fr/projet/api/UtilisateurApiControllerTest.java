@@ -1,33 +1,41 @@
 
 package fr.projet.api;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -40,19 +48,13 @@ import fr.projet.feignClient.NoteFeignClient;
 import fr.projet.feignClient.PasswordFeignClient;
 import fr.projet.model.Utilisateur;
 import fr.projet.repository.UtilisateurRepository;
+import fr.projet.response.CompteResponse;
 import fr.projet.response.NoteResponse;
 import fr.projet.response.PasswordCheckResponse;
 import fr.projet.response.UtilisateurResponse;
 import fr.projet.service.UtilisateurLogService;
 import fr.projet.service.UtilisateurService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import fr.projet.response.CompteResponse;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -277,6 +279,43 @@ public class UtilisateurApiControllerTest {
 //            .andExpect(jsonPath("$.email").value("sara@example.com"))
 //            .andExpect(jsonPath("$.username").value("sawsana"));
 // }
+@Test
+public void testInscription_Success() throws Exception {
+    // Créez un objet InscriptionDTO avec les données de test valides
+    InscriptionDTO inscriptionDTO = new InscriptionDTO();
+    inscriptionDTO.setEmail("hajar@test.com");
+    inscriptionDTO.setUsername("hajar");
+    inscriptionDTO.setPasswordValue("vGM*6$eTswFA"); // Mot de passe considéré comme fort
+    inscriptionDTO.setBirthdate(LocalDate.of(1999, 9, 20)); // Date de naissance valide
+
+    // Simulez que l'e-mail n'existe pas déjà dans la base de données
+    when(utilisateurRepository.existsByEmail("hajar@test.com")).thenReturn(false);
+
+    // Simulez la réponse de Feign Client pour la vérification de vulnérabilité du mot de passe
+    PasswordCheckResponse vulnerabilityResponse = new PasswordCheckResponse(false, false, "Le mot de passe n'est pas vulnérable");
+    when(passwordFeignClient.checkPasswordVulnerability(any())).thenReturn(vulnerabilityResponse);
+
+    // Simulez la réponse de Feign Client pour la vérification de la force du mot de passe
+    PasswordCheckResponse strengthResponse = new PasswordCheckResponse(true, true, "Le mot de passe est suffisamment fort");
+    when(passwordFeignClient.checkPasswordStrength(any())).thenReturn(strengthResponse);
+
+    // Simulez l'enregistrement de l'utilisateur dans la base de données
+    Utilisateur utilisateur = new Utilisateur();
+    utilisateur.setEmail(inscriptionDTO.getEmail());
+    utilisateur.setUsername(inscriptionDTO.getUsername());
+    utilisateur.setPassword(inscriptionDTO.getPassword());
+    utilisateur.setBirthdate(inscriptionDTO.getBirthdate());
+    when(utilisateurRepository.save(any(Utilisateur.class))).thenReturn(utilisateur);
+
+    // Effectuez la requête POST vers /api/utilisateur/inscription
+    mockMvc.perform(post("/api/utilisateur/inscription")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(inscriptionDTO)))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.email").value("hajar@test.com"))
+            .andExpect(jsonPath("$.username").value("hajar"));
+}
 
 private static String asJsonString(final Object obj) {
     try {
@@ -288,6 +327,8 @@ private static String asJsonString(final Object obj) {
         throw new RuntimeException(e);
     }
 }
+
+
      @Test
     public void testInscription_EmailAlreadyExists() throws Exception {
         // Création d'un InscriptionDTO avec un e-mail existant dans la base de données
