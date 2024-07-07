@@ -1,3 +1,25 @@
+Skip to content
+Navigation Menu
+saousanebst
+/
+ProjetSoutenance-Microservices-Java
+
+Type / to search
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+Java CI with Maven
+firs build #2
+Jobs
+Run details
+Workflow file for this run
+.github/workflows/maven.yml at 1be1990
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
 
@@ -45,9 +67,9 @@ jobs:
         run: |
           mvn sonar:sonar -Dsonar.projectKey=Projet-java \
                           -Dsonar.projectName="Projet-java" \
-                          -Dsonar.sources=service-compte/src/main/java/fr/projet,service-utilisateur/src/main/java/fr/projet,service-gestion-password/src/main/java/fr/projet,service-notes/src/main/java/fr/projet \
-                          -Dsonar.tests=service-compte/src/test/java/fr/projet,service-utilisateur/src/test/java/fr/projet,service-gestion-password/src/test/java/fr/projet,service-notes/src/test/java/fr/projet \
-                          -Dsonar.java.binaries=compte/target/classes,service-utilisateur/target/classes,service-gestion-password//target/classes,service-notes/target/classes
+                          -Dsonar.sources=service-compte/src/main/java,service-utilisateur/src/main/java,service-gestion-password/src/main/java,service-notes/src/main/java \
+                          -Dsonar.tests=service-compte/src/test/java,service-utilisateur/src/test/java,service-gestion-password/src/test/java,service-notes/src/test/java \
+                          -Dsonar.java.binaries=service-compte/target/classes,service-utilisateur/target/classes,service-gestion-password/target/classes,service-notes/target/classes
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -60,3 +82,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+firs build · saousanebst/ProjetSoutenance-Microservices-Java@1be1990
