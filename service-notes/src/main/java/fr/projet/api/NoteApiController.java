@@ -159,12 +159,7 @@ public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note)
 
 
 
-// //delete	
-// 	@DeleteMapping("/{id}")
-// 	public void deleteById(@PathVariable String id) 
-// 	{
-// 		noteSrv.deleteNoteById(id);
-// 	}
+
 @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable String id) {
         try {
@@ -208,6 +203,7 @@ public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note)
             privateKeyEntity.setNoteId(note.getId());
             privateKeyEntity.setPrivateKey(cryptoService.encodePrivateKey(keyPair.getPrivate()));
             this.privateKeyRepository.save(privateKeyEntity);
+            
             noteLogService.logInfo("Created note with ID: " + note.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(note.getId().toString());
         } catch (Exception e) {
