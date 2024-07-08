@@ -1,4 +1,5 @@
 name: Java CI with Maven
+
 on:
   push:
     branches: [ "main" ]
@@ -13,11 +14,19 @@ jobs:
       matrix:
         service: [service-compte, service-utilisateur, service-notes, service-gestion-password]
 
+      include:
+        - service: service-compte
+          DATABASE_NAME: bddcompte
+        - service: service-utilisateur
+          DATABASE_NAME: bddutilisateur
+        - service: service-notes
+          DATABASE_NAME: bddnote
+        - service: service-gestion-password
+          DATABASE_NAME: password
+
     env:
-      DATABASE_NAME_COMPTE: bddcompte
-      DATABASE_NAME_UTILISATEUR: bddutilisateur
-      DATABASE_NAME_NOTE: bddnote
-      DATABASE_NAME_PASSWORD: password
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: root
 
     steps:
       - name: Checkout repository
@@ -47,9 +56,9 @@ jobs:
 
       - name: Run Unit Tests
         env:
-          DATABASE_URL: "jdbc:postgresql://127.0.0.1:5432/${{ env['DATABASE_NAME_' + matrix.service.replace('-', '_').toUpperCase()] }}"
-          DATABASE_USERNAME: postgres
-          DATABASE_PASSWORD: root
+          DATABASE_URL: "jdbc:postgresql://127.0.0.1:5432/${{ matrix.DATABASE_NAME }}"
+          DATABASE_USERNAME: ${{ env.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ env.DATABASE_PASSWORD }}
         run: |
           echo "Running unit tests for ${{ matrix.service }}"
           mvn -B test --file ${{ matrix.service }}/pom.xml
