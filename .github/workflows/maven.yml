@@ -20,8 +20,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-
-      # Microservice 1
       - name: Build and Test Microservice 1
         run: |
           cd service-utilisateur
@@ -31,9 +29,6 @@ jobs:
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
             -Dsonar.projectKey=Projet-java
           mvn org.jacoco:jacoco-maven-plugin:report
-
-        # Exécuter les tests en mode debug pour obtenir plus d'informations sur les erreurs
-        # et les problèmes de dépendance
         - name: Run tests with debug information
           run: mvn clean test -X
 
