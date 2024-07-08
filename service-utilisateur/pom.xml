@@ -16,8 +16,6 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.2</spring-cloud.version>
-
-    <sonar.login>your_sonar_token</sonar.login> <!-- Si l'authentification est requise -->
 	</properties>
 	  <dependencies>
         <!-- Spring Boot Starters -->
@@ -119,11 +117,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-			 <plugin>
-            <groupId>org.sonarsource.scanner.maven</groupId>
-            <artifactId>sonar-maven-plugin</artifactId>
-			<version>4.0.0.4121</version>
-        </plugin>
         </plugins>
     </build>
 
