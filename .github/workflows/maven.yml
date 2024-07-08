@@ -1,25 +1,4 @@
-Skip to content
-Navigation Menu
-saousanebst
-/
-ProjetSoutenance-Microservices-Java
 
-Type / to search
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-Java CI with Maven
-firs build #2
-Jobs
-Run details
-Workflow file for this run
-.github/workflows/maven.yml at 1be1990
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
 
@@ -51,25 +30,16 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build and test compte service
-        run: mvn -B -f service-compte/pom.xml clean verify
-
-      - name: Build and test utilisateur service
-        run: mvn -B -f service-utilisateur/pom.xml clean verify
-
-      - name: Build and test password service
-        run: mvn -B -f service-gestion-password/pom.xml clean verify
-
-      - name: Build and test note
-        run: mvn -B -f service-notes/pom.xml clean verify
-
-      - name: Run SonarQube scan for all services
-        run: |
-          mvn sonar:sonar -Dsonar.projectKey=Projet-java \
-                          -Dsonar.projectName="Projet-java" \
-                          -Dsonar.sources=service-compte/src/main/java,service-utilisateur/src/main/java,service-gestion-password/src/main/java,service-notes/src/main/java \
-                          -Dsonar.tests=service-compte/src/test/java,service-utilisateur/src/test/java,service-gestion-password/src/test/java,service-notes/src/test/java \
-                          -Dsonar.java.binaries=service-compte/target/classes,service-utilisateur/target/classes,service-gestion-password/target/classes,service-notes/target/classes
+      - name: Code coverage & scan SonarQube & packaging JAR
+        run: >
+          mvn
+          org.jacoco:jacoco-maven-plugin:prepare-agent
+          package
+          verify
+          org.jacoco:jacoco-maven-plugin:report
+          sonar:sonar
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+          -Dsonar.projectKey=Projet-java
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -78,8 +48,7 @@ jobs:
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
         with:
-          scanMetadataReportFile: service-compte/target/sonar/report-task.txt
+          scanMetadataReportFile: target/sonar/report-task.txt
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-firs build · saousanebst/ProjetSoutenance-Microservices-Java@1be1990
