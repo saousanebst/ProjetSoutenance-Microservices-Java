@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [service-password, service-compte, service-notes, service-gestion-password]  # Liste des microservices à analyser
+        service: [service-gestion-password, service-compte, service-notes, service-utilisateur]  # Liste des microservices à analyser
 
     steps:
       - name: Checkout repository
