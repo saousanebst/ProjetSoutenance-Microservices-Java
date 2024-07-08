@@ -1,4 +1,12 @@
-name: Java CI with Maven
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Premier Pipeline Java
 
 on:
   push:
@@ -7,11 +15,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout du code
+      - name: Récupération du code
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -21,23 +29,26 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build and Test Microservice 1
-        run: |
+      - name: Code coverage & scan SonarQube & packaging JAR
+        run: >
           cd service-utilisateur
-          mvn clean verify -e
-          mvn org.jacoco:jacoco-maven-plugin:prepare-agent package
-          mvn sonar:sonar \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-            -Dsonar.projectKey=Projet-java
-          mvn org.jacoco:jacoco-maven-plugin:report
+          mvn
+          org.jacoco:jacoco-maven-plugin:prepare-agent
+          package
+          verify
+          org.jacoco:jacoco-maven-plugin:report
+          sonar:sonar
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+          -Dsonar.projectKey=Projet-java
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: Run tests with debug information
-        run: mvn clean test -e
-             mvn clean test -X
-
-      - name: Quality Gate Microservice 1
+      - name: Qualité SonarQube
         uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
         with:
-          projectKey: Projet-java
-          serverUrl: ${{ secrets.SONAR_HOST_URL }}
-          token: ${{ secrets.SONAR_TOKEN }}
+          scanMetadataReportFile: target/sonar/report-task.txt
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
