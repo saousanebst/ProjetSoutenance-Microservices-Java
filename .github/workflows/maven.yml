@@ -12,17 +12,15 @@ jobs:
 
     strategy:
       matrix:
-        service: [service-compte, service-utilisateur, service-notes, service-gestion-password]
-
-      include:
-        - service: service-compte
-          DATABASE_NAME: bddcompte
-        - service: service-utilisateur
-          DATABASE_NAME: bddutilisateur
-        - service: service-notes
-          DATABASE_NAME: bddnote
-        - service: service-gestion-password
-          DATABASE_NAME: password
+        service:
+          - name: service-compte
+            DATABASE_NAME: bddcompte
+          - name: service-utilisateur
+            DATABASE_NAME: bddutilisateur
+          - name: service-notes
+            DATABASE_NAME: bddnote
+          - name: service-gestion-password
+            DATABASE_NAME: password
 
     env:
       DATABASE_USERNAME: postgres
@@ -40,15 +38,15 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn -B package --file ${{ matrix.service }}/pom.xml
+        run: mvn -B package --file ${{ matrix.service.name }}/pom.xml
 
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          mvn -f ${{ matrix.service }}/pom.xml clean verify sonar:sonar \
-            -Dsonar.projectKey=Projet-java-${{ matrix.service }} \
+          mvn -f ${{ matrix.service.name }}/pom.xml clean verify sonar:sonar \
+            -Dsonar.projectKey=Projet-java-${{ matrix.service.name }} \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.junit.reportPaths=target/surefire-reports/*.xml \
@@ -56,12 +54,12 @@ jobs:
 
       - name: Run Unit Tests
         env:
-          DATABASE_URL: "jdbc:postgresql://127.0.0.1:5432/${{ matrix.DATABASE_NAME }}"
+          DATABASE_URL: "jdbc:postgresql://127.0.0.1:5432/${{ matrix.service.DATABASE_NAME }}"
           DATABASE_USERNAME: ${{ env.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ env.DATABASE_PASSWORD }}
         run: |
-          echo "Running unit tests for ${{ matrix.service }}"
-          mvn -B test --file ${{ matrix.service }}/pom.xml
+          echo "Running unit tests for ${{ matrix.service.name }}"
+          mvn -B test --file ${{ matrix.service.name }}/pom.xml
 
       - name: Update dependency graph
         uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
