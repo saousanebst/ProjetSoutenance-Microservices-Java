@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import fr.projet.service.CryptographService;
 
-@SpringBootTest
+
 class ServiceCompteApplicationTests {
 @Autowired
 
