@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [service-utilisateur, service-notes, service-compte, service-gestion-password]  # Liste des microservices à analyser
+#        service: [service-utilisateur, service-notes, service-compte, service-gestion-password]  # Liste des microservices à analyser
+        service: [service-utilisateur]  # Liste des microservices à analyser
 
     steps:
       - name: Checkout repository
@@ -38,7 +39,7 @@ jobs:
           org.jacoco:jacoco-maven-plugin:report
           sonar:sonar
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-          -Dsonar.projectKey=MyProject-${{ matrix.service }}
+          -Dsonar.projectKey=SERVICE_UTILISATEUR
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
