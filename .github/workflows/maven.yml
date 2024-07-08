@@ -10,6 +10,7 @@ jobs:
       DATABASE_NAME_COMPTE: bddcompte
       DATABASE_NAME_UTILISATEUR: bddutilisateur
       DATABASE_NAME_NOTE: bddnote
+      DATABASE_NAME_NOTE: password
 
     steps:
       - name: Checkout repository
