@@ -38,7 +38,7 @@ jobs:
           org.jacoco:jacoco-maven-plugin:report
           sonar:sonar
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-          -Dsonar.projectKey=titiw-${{ matrix.service }}
+          -Dsonar.projectKey=titiw
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
