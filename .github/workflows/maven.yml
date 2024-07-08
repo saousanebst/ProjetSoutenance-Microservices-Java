@@ -30,7 +30,7 @@ jobs:
           cache: maven
 
       - name: Code coverage & scan SonarQube & packaging JAR
-        run: >
+        run: |
           cd service-utilisateur
           mvn
           org.jacoco:jacoco-maven-plugin:prepare-agent
