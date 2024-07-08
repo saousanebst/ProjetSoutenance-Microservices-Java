@@ -38,14 +38,14 @@ jobs:
           org.jacoco:jacoco-maven-plugin:report
           sonar:sonar
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-          -Dsonar.projectKey=Projet-java-${{ matrix.service }}
+          -Dsonar.projectKey=titiw-${{ matrix.service }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
 
 
-          
+
       - name: Qualité SonarQube
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
