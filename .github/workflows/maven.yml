@@ -42,7 +42,7 @@ jobs:
       run: |
         mvn -f ${{ matrix.service }}/pom.xml sonar:sonar \
           -Dsonar.projectKey=Projet-java-${{ matrix.service }} \
-          -Dsonar.host.url=https://your-sonarqube-server-url/ \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}  # Configurez SonarQube pour chaque microservice
 
     - name: Run Unit Tests
