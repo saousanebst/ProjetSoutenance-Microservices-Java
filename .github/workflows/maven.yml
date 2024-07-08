@@ -1,3 +1,4 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 name: Java CI with Maven
 
 on:
@@ -23,6 +24,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
+      - name: Test SonarQube connectivity
+        run: |
+          curl -v ${{ secrets.SONAR_HOST_URL }}
 
       - name: Code coverage & scan SonarQube & packaging JAR
         run: >
