@@ -32,7 +32,8 @@ jobs:
           mvn org.jacoco:jacoco-maven-plugin:report
 
       - name: Run tests with debug information
-        run: mvn clean test -X
+        run: mvn clean test -e
+             mvn clean test -X
 
       - name: Quality Gate Microservice 1
         uses: sonarsource/sonarqube-quality-gate-action@master
