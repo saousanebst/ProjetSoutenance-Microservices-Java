@@ -108,6 +108,11 @@
 					</image>
 				</configuration>
 			</plugin>
+			<plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>sonar-maven-plugin</artifactId>
+      <version>3.10.0.333</version> <!-- Assurez-vous d'utiliser la version appropriée -->
+    </plugin>
 		</plugins>
 	</build>
 
