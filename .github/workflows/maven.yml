@@ -20,6 +20,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
       - name: Build and Test Microservice 1
         run: |
           cd service-utilisateur
@@ -29,8 +30,9 @@ jobs:
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
             -Dsonar.projectKey=Projet-java
           mvn org.jacoco:jacoco-maven-plugin:report
-        - name: Run tests with debug information
-          run: mvn clean test -X
+
+      - name: Run tests with debug information
+        run: mvn clean test -X
 
       - name: Quality Gate Microservice 1
         uses: sonarsource/sonarqube-quality-gate-action@master
