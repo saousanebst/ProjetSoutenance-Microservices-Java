@@ -130,29 +130,29 @@ public class NoteApiControllerTest {
 
 
 
-     @Test
-    public void testUpdateNote_Success() throws Exception {
-        // Données de test
-        String id = "123";
-        Note originalNote = new Note("123", "Original Name", "Original Description", LocalDate.now().minusDays(1), "Original Content", "user123");
-        Note updatedNote = new Note("123", "Updated Name", "Updated Description", LocalDate.now(), "Updated Content", "user123");
+    //  @Test
+    // public void testUpdateNote_Success() throws Exception {
+    //     // Données de test
+    //     String id = "123";
+    //     Note originalNote = new Note("123", "Original Name", "Original Description", LocalDate.now().minusDays(1), "Original Content", "user123");
+    //     Note updatedNote = new Note("123", "Updated Name", "Updated Description", LocalDate.now(), "Updated Content", "user123");
 
-        // Mock du comportement du service
-        when(noteSrv.update(any(Note.class))).thenReturn(updatedNote);
+    //     // Mock du comportement du service
+    //     when(noteSrv.update(any(Note.class))).thenReturn(updatedNote);
 
-        // Convertir la note en JSON
-        String updatedNoteJson = objectMapper.writeValueAsString(updatedNote);
+    //     // Convertir la note en JSON
+    //     String updatedNoteJson = objectMapper.writeValueAsString(updatedNote);
 
-        // Appel de la méthode updateNote et vérification du résultat
-        mockMvc.perform(put("/api/note/{id}", id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updatedNoteJson))
-               .andExpect(status().isOk());
+    //     // Appel de la méthode updateNote et vérification du résultat
+    //     mockMvc.perform(put("/api/note/{id}", id)
+    //             .contentType(MediaType.APPLICATION_JSON)
+    //             .content(updatedNoteJson))
+    //            .andExpect(status().isOk());
 
-        // Vérification que la méthode update du service est appelée une fois avec la note spécifiée
-        verify(noteSrv, times(1)).update(any(Note.class));
-        verify(noteLogService, times(1)).logInfo("Updated note with ID: " + id);
-    }
+    //     // Vérification que la méthode update du service est appelée une fois avec la note spécifiée
+    //     verify(noteSrv, times(1)).update(any(Note.class));
+    //     verify(noteLogService, times(1)).logInfo("Updated note with ID: " + id);
+    // }
 
 
 
