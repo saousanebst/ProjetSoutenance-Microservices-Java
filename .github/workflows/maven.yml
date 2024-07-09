@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         #service: [service-utilisateur, service-notes, service-compte, service-gestion-password]  # Liste des microservices à analyser
-        service: [service-utilisateur, service-compte, service-gestion-password]  # Liste des microservices à analyser
+        service: [service-utilisateur, service-compte, service-gestion-password,service-notes]  # Liste des microservices à analyser
         #service: [service-utilisateur]  # Liste des microservices à analyser
 
     steps:
