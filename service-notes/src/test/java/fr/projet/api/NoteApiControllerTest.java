@@ -52,7 +52,6 @@ import fr.projet.service.NoteLogService;
 import fr.projet.service.NoteService;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 @AutoConfigureMockMvc
 public class NoteApiControllerTest {
     
