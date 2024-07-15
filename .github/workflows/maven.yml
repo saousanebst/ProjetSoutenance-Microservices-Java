@@ -60,7 +60,7 @@ jobs:
         with:
           name: appjar-${{ matrix.service }}
           path: ${{ matrix.service }}/target/*.jar
-  build:
+   build-and-push-image:
     needs: test
     runs-on: ubuntu-latest
     strategy:
@@ -98,6 +98,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.service }}  # Utilisez le dossier du microservice comme contexte
-          file: ${{ matrix.service }}/Dockerfile  # Chemin relatif au Dockerfile
+          file: ${{ matrix.service }}/Dockerfile  # Chemin relatif correct vers le Dockerfile
           push: true
           tags: saousane/ajc-soutenance:java-${{ matrix.service }}
