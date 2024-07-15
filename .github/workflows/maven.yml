@@ -102,4 +102,28 @@ jobs:
           file: ${{ matrix.service }}/Dockerfile  # Chemin relatif correct vers le Dockerfile
           push: true
           tags: saousane/ajc-soutenance:java-${{ matrix.service }}
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Préparation de la connexion SSH vers notre machine
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: Commandes pour info à exécuter sur la machine distante
+        run: >
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}
+          "
+            docker stop ajc-soutenance || true
+            docker ajc-soutenance  || true
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN_SERVER }}
+            docker run -d -p 8087:8080 --name ajc-soutenance  --pull=always saousane/ajc-soutenance:java-${{ matrix.service }}
+            exit
+          "
+        
+      - name: Nettoyage
+        run: rm -rf ~/.ssh
           
