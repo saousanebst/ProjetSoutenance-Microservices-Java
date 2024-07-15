@@ -95,5 +95,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: target/${{ matrix.service }}
+          file: target/${{ matrix.service }}/Dockerfile
           push: true
           tags: saousane/ajc-soutenance:java-${{ matrix.service }}
