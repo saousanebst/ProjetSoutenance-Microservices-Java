@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [service-utilisateur, service-compte, service-gestion-password,service-notes]
+        service: [service-utilisateur, service-compte, service-gestion-password, service-notes]
 
     steps:
       - name: Checkout du projet
@@ -77,7 +77,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: appjar-${{ matrix.service }}
-          path: target/${{ matrix.service }}
+          path: ${{ matrix.service }}/target
 
       - name: Installation QEMU
         uses: docker/setup-qemu-action@v3
@@ -94,7 +94,7 @@ jobs:
       - name: Build de l'image & Push de l'image sur le Docker Hub
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.service }}
-          file: ${{ matrix.service }}/Dockerfile
+          context: ${{ matrix.service }}  # Utilisez le dossier du microservice comme contexte
+          file: ${{ matrix.service }}/Dockerfile  # Chemin relatif au Dockerfile
           push: true
           tags: saousane/ajc-soutenance:java-${{ matrix.service }}
