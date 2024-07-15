@@ -75,8 +75,8 @@ jobs:
       - name: Récupération du fichier JAR
         uses: actions/download-artifact@v3
         with:
-          name: appjar
-          path: target
+          name: appjar-${{ matrix.service }}
+          path: target/${{ matrix.service }}
 
       - name: Installation QEMU
         uses: docker/setup-qemu-action@v3
