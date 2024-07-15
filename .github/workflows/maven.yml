@@ -118,8 +118,6 @@ jobs:
         run: >
           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}
           "
-            docker stop ajc-soutenance || true
-            docker ajc-soutenance  || true
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN_SERVER }}
             docker run -d -p 8087:8080 --name ajc-soutenance  --pull=always saousane/ajc-soutenance:java-${{ matrix.service }}
             exit
