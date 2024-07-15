@@ -71,10 +71,6 @@ jobs:
     steps:
       - name: Checkout du projet
         uses: actions/checkout@v4
-      - name: Nettoyer le cache Maven et Docker
-        run: |
-          mvn clean
-          docker system prune -af
       
       - name: Récupération du fichier JAR
         uses: actions/download-artifact@v3
