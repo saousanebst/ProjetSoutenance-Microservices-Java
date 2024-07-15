@@ -119,7 +119,10 @@ jobs:
           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}
           "
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN_SERVER }}
-            docker run -d -p 8087:8080 --name ajc-soutenance  --pull=always saousane/ajc-soutenance:java-service-gestion-password
+            docker stop ajc-soutenance-${{ matrix.service }} || true
+            docker rm ajc-soutenance-${{ matrix.service }} || true
+            docker pull saousane/ajc-soutenance:java-${{ matrix.service }}
+            docker run -d -p $((8080 + matrix.index * 100)):8080 --name ajc-soutenance-${{ matrix.service }} --pull=always saousane/ajc-soutenance:java-${{ matrix.service }}
             exit
           "
       - name: Nettoyage
