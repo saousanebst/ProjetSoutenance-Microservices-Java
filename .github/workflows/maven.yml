@@ -101,3 +101,4 @@ jobs:
           file: ${{ matrix.service }}/Dockerfile  # Chemin relatif correct vers le Dockerfile
           push: true
           tags: saousane/ajc-soutenance:java-${{ matrix.service }}
+          
