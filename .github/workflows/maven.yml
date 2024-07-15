@@ -94,6 +94,6 @@ jobs:
       - name: Build de l'image & Push de l'image sur le Docker Hub
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: target/${{ matrix.service }}
           push: true
           tags: saousane/ajc-soutenance:java-${{ matrix.service }}
