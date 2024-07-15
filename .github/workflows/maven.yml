@@ -61,75 +61,12 @@ jobs:
           name: appjar-${{ matrix.service }}
           path: ${{ matrix.service }}/target/*.jar
    
-  # build:
-  #   needs: test
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       service: [ service-utilisateur, service-compte, service-gestion-password,service-notes]
-
-  #   steps:
-  #     - name: Checkout du projet
-  #       uses: actions/checkout@v4
-      
-  #     - name: Récupération du fichier JAR
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: appjar-${{ matrix.service }}
-  #         path: ${{ matrix.service }}/target
-
-  #     - name: Afficher le contenu du répertoire de chaque service
-  #       run: |
-  #         echo "Contenu du répertoire ${{ matrix.service }}:"
-  #         ls -R ${{ matrix.service }}
-
-  #     - name: Installation QEMU
-  #       uses: docker/setup-qemu-action@v3
-
-  #     - name: Installation Docker BuildX
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: Connexion au Docker Hub
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN_GITHUB }}
-
-  #     - name: Build de l'image & Push de l'image sur le Docker Hub
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: ${{ matrix.service }}  # Utilisez le dossier du microservice comme contexte
-  #         file: ${{ matrix.service }}/Dockerfile  # Chemin relatif correct vers le Dockerfile
-  #         push: true
-  #         tags: saousane/ajc-soutenance:java-${{ matrix.service }}
-
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Préparation de la connexion SSH vers notre machine
-  #       run: |
-  #         install -m 600 -D /dev/null ~/.ssh/id_rsa
-  #         echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-  #         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-
-  #     - name: Commandes pour info à exécuter sur la machine distante
-  #       run: >
-  #         ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}
-  #         "
-  #           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN_SERVER }}
-  #           docker run -d -p 8087:8080 --name ajc-soutenance  --pull=always saousane/ajc-soutenance:java-${{ matrix.service }}
-  #           exit
-  #         "
-  #     - name: Nettoyage
-  #       run: rm -rf ~/.ssh
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build:
     needs: test
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [service-utilisateur, service-compte, service-gestion-password, service-notes]  # Liste des microservices à déployer
+        service: [ service-utilisateur, service-compte, service-gestion-password,service-notes]
 
     steps:
       - name: Checkout du projet
@@ -167,7 +104,7 @@ jobs:
           tags: saousane/ajc-soutenance:java-${{ matrix.service }}
 
   deploy:
-    needs: build-and-deploy
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -182,10 +119,9 @@ jobs:
           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}
           "
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN_SERVER }}
-            docker run -d -p 8087:8080 --name ajc-soutenance-${{ matrix.service }} --pull=always saousane/ajc-soutenance:java-${{ matrix.service }}
+            docker run -d -p 8087:8080 --name ajc-soutenance  --pull=always saousane/ajc-soutenance:java-service-gestion-password
             exit
           "
-
       - name: Nettoyage
         run: rm -rf ~/.ssh
           
