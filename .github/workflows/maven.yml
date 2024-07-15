@@ -62,6 +62,7 @@ jobs:
         with:
           name: appjar-${{ matrix.service }}
           path: ${{ matrix.service }}/target/*.jar
+  
   build:
     needs: test
     runs-on: ubuntu-latest
