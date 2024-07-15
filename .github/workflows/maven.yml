@@ -118,9 +118,17 @@ jobs:
           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}
           "
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN_SERVER }}
+            docker stop ajc-soutenance-password || true
+            docker rm ajc-soutenance-password || true
             docker run -d -p 8081:8080 --name ajc-soutenance-password  --pull=always saousane/ajc-soutenance:java-service-gestion-password
+            docker stop ajc-soutenance-utilisateur || true
+            docker rm ajc-soutenance-utilisateur || true
             docker run -d -p 8086:8080 --name ajc-soutenance-utilisateur --pull=always saousane/ajc-soutenance:java-service-utilisateur
+            docker stop ajc-soutenance-note || true
+            docker rm ajc-soutenance-note || true
             docker run -d -p 8083:8080 --name ajc-soutenance-note --pull=always saousane/ajc-soutenance:java-service-notes
+            docker stop ajc-soutenance-compte || true
+            docker rm ajc-soutenance-compte || true
             docker run -d -p 8084:8080 --name ajc-soutenance-compte --pull=always saousane/ajc-soutenance:java-service-compte
             exit
           "
