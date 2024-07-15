@@ -79,6 +79,11 @@ jobs:
           name: appjar-${{ matrix.service }}
           path: ${{ matrix.service }}/target
 
+      - name: Afficher le contenu du répertoire de chaque service
+        run: |
+          echo "Contenu du répertoire ${{ matrix.service }}:"
+          ls -R ${{ matrix.service }}
+
       - name: Installation QEMU
         uses: docker/setup-qemu-action@v3
 
