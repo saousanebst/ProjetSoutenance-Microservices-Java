@@ -60,7 +60,8 @@ jobs:
         with:
           name: appjar-${{ matrix.service }}
           path: ${{ matrix.service }}/target/*.jar
-   build-and-push-image:
+   
+  build-and-push-image:
     needs: test
     runs-on: ubuntu-latest
     strategy:
