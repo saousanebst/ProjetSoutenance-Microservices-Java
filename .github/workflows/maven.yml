@@ -61,7 +61,7 @@ jobs:
           name: appjar-${{ matrix.service }}
           path: ${{ matrix.service }}/target/*.jar
    
-  build-and-push-image:
+  build:
     needs: test
     runs-on: ubuntu-latest
     strategy:
@@ -102,6 +102,7 @@ jobs:
           file: ${{ matrix.service }}/Dockerfile  # Chemin relatif correct vers le Dockerfile
           push: true
           tags: saousane/ajc-soutenance:java-${{ matrix.service }}
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -123,7 +124,6 @@ jobs:
             docker run -d -p 8087:8080 --name ajc-soutenance  --pull=always saousane/ajc-soutenance:java-${{ matrix.service }}
             exit
           "
-        
       - name: Nettoyage
         run: rm -rf ~/.ssh
           
