@@ -1,10 +1,10 @@
-package fr.projet.Repository;
+package fr.projet.Repository.secondary;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import fr.projet.model.PrivateKey;
+import fr.projet.model.secondary.PrivateKey;
 
 public interface PrivateKeyRepository extends JpaRepository<PrivateKey, String> {
     Optional<PrivateKey> findByNoteId(String noteId);

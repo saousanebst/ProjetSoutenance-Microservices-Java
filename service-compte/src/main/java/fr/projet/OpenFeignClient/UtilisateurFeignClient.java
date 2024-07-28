@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import fr.projet.model.Compte;
+import fr.projet.model.primary.Compte;
 
 @FeignClient(value = "service-utilisateur", path = "/api/utilisateur", fallback = UtilisateurFeignClient.Fallback.class)
 public interface UtilisateurFeignClient {

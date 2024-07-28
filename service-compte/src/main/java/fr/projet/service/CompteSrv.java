@@ -2,13 +2,14 @@ package fr.projet.service;
 
 import java.time.LocalDate;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.projet.model.Compte;
-import fr.projet.model.PrivateKey;
-import fr.projet.repository.CompteRepository;
-import fr.projet.repository.PrivateKeyRepository;
+import fr.projet.model.primary.Compte;
+import fr.projet.model.secondary.PrivateKey;
+import fr.projet.repository.primary.CompteRepository;
+import fr.projet.repository.secondary.PrivateKeyRepository;
 
 @Service
 public class CompteSrv {

@@ -1,34 +1,34 @@
 package fr.projet.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 import fr.projet.OpenFeignClient.PasswordFeignClient;
-import fr.projet.model.Compte;
-import fr.projet.model.PrivateKey;
-import fr.projet.repository.CompteRepository;
-import fr.projet.repository.PrivateKeyRepository;
+import fr.projet.model.primary.Compte;
+import fr.projet.model.secondary.PrivateKey;
+import fr.projet.repository.primary.CompteRepository;
+import fr.projet.repository.secondary.PrivateKeyRepository;
 import fr.projet.request.CreateCompteRequest;
 import fr.projet.request.PasswordCheckRequest;
 import fr.projet.response.CompteResponse;
@@ -38,7 +38,7 @@ import fr.projet.service.CompteSrv;
 import fr.projet.service.CryptographService;
 import fr.projet.service.LogService;
 
-import org.springframework.http.HttpStatus;
+
 
 
 

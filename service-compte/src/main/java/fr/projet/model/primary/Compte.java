@@ -1,4 +1,4 @@
-package fr.projet.model;
+package fr.projet.model.primary;
 
 import java.time.LocalDate;
 
@@ -17,7 +17,7 @@ public class Compte{
     @UuidGenerator
     private String id;
     private String publicKey;
-    @Column(nullable=false)
+    // @Column(nullable=false)
     private String platformName;
 
     private String platformDescription;

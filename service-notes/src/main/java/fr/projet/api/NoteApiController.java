@@ -2,7 +2,6 @@ package fr.projet.api;
 
 import java.security.KeyPair;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,11 +24,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.projet.Repository.NoteRepository;
-import fr.projet.Repository.PrivateKeyRepository;
+import fr.projet.Repository.primary.NoteRepository;
+import fr.projet.Repository.secondary.PrivateKeyRepository;
 import fr.projet.Response.NoteResponse;
-import fr.projet.model.Note;
-import fr.projet.model.PrivateKey;
+import fr.projet.model.primary.Note;
+import fr.projet.model.secondary.PrivateKey;
 import fr.projet.request.CreateNoteRequest;
 import fr.projet.service.CryptoService;
 import fr.projet.service.NoteLogService;
@@ -224,7 +222,7 @@ public Note updatePartielleNote(@PathVariable String id, @RequestBody Note note)
            }
    
            Note note = noteOptional.get();
-           Optional<fr.projet.model.PrivateKey> privateKeyOptional = privateKeyRepository.findByNoteId(noteId);
+           Optional<fr.projet.model.secondary.PrivateKey> privateKeyOptional = privateKeyRepository.findByNoteId(noteId);
            if (!privateKeyOptional.isPresent()) {
                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Clé privée non trouvée pour cette note");
            }

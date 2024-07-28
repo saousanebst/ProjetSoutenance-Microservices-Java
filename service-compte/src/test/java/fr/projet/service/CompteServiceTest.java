@@ -1,25 +1,24 @@
 package fr.projet.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
-import fr.projet.model.Compte;
-import fr.projet.model.PrivateKey;
-import fr.projet.repository.CompteRepository;
-import fr.projet.repository.PrivateKeyRepository;
+import fr.projet.model.primary.Compte;
+import fr.projet.model.secondary.PrivateKey;
+import fr.projet.repository.primary.CompteRepository;
+import fr.projet.repository.secondary.PrivateKeyRepository;
 
 public class CompteServiceTest {
     

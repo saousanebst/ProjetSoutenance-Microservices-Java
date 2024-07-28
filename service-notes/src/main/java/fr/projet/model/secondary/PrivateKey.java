@@ -1,13 +1,10 @@
-package fr.projet.model;
+package fr.projet.model.secondary;
 
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Entity;
-
-import jakarta.persistence.Table;
-
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 
 
 @Entity

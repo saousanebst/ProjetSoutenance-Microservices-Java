@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.projet.OpenFeignClient.PasswordFeignClient;
-import fr.projet.model.Compte;
-import fr.projet.model.PrivateKey;
-import fr.projet.repository.CompteRepository;
-import fr.projet.repository.PrivateKeyRepository;
+import fr.projet.model.primary.Compte;
+import fr.projet.model.secondary.PrivateKey;
+import fr.projet.repository.primary.CompteRepository;
+import fr.projet.repository.secondary.PrivateKeyRepository;
 import fr.projet.request.CreateCompteRequest;
 import fr.projet.request.PasswordCheckRequest;
 import fr.projet.response.CompteResponse;
