@@ -43,6 +43,7 @@ jobs:
           -Dsonar.projectKey=projet-${{ matrix.service }}
           -Dsonar.projectName=projet-${{ matrix.service }}
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.coverage.exclusions=**/*DataSourceConfig.java
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
