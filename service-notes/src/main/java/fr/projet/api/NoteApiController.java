@@ -24,12 +24,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.projet.Repository.primary.NoteRepository;
-import fr.projet.Repository.secondary.PrivateKeyRepository;
-import fr.projet.Response.NoteResponse;
 import fr.projet.model.primary.Note;
 import fr.projet.model.secondary.PrivateKey;
+import fr.projet.repository.primary.NoteRepository;
+import fr.projet.repository.secondary.PrivateKeyRepository;
 import fr.projet.request.CreateNoteRequest;
+import fr.projet.response.NoteResponse;
 import fr.projet.service.CryptoService;
 import fr.projet.service.NoteLogService;
 import fr.projet.service.NoteService;

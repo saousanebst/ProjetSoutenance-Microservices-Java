@@ -21,8 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.web.servlet.MockMvc;
 
-import fr.projet.Repository.primary.NoteRepository;
 import fr.projet.model.primary.Note;
+import fr.projet.repository.primary.NoteRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class NoteServiceTest {

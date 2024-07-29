@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PatchMapping;
 
-import fr.projet.Repository.primary.NoteRepository;
 import fr.projet.model.primary.Note;
+import fr.projet.repository.primary.NoteRepository;
 import fr.projet.request.CreateNoteRequest;
 
 @Service

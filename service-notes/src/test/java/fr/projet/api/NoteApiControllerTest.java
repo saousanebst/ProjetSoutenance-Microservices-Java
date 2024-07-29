@@ -32,10 +32,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.projet.Repository.primary.NoteRepository;
-import fr.projet.Repository.secondary.PrivateKeyRepository;
 import fr.projet.model.primary.Note;
 import fr.projet.model.secondary.PrivateKey;
+import fr.projet.repository.primary.NoteRepository;
+import fr.projet.repository.secondary.PrivateKeyRepository;
 import fr.projet.service.CryptoService;
 import fr.projet.service.NoteLogService;
 import fr.projet.service.NoteService;
