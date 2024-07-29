@@ -22,6 +22,7 @@ import com.zaxxer.hikari.HikariDataSource;
     entityManagerFactoryRef = "secondaryEntityManagerFactory",
     transactionManagerRef = "secondaryTransactionManager"
 )
+@SuppressWarnings("java:S4449")
 public class SecondaryDataSourceConfig {
 
     @Bean(name = "secondaryDataSource")

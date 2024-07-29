@@ -23,6 +23,7 @@ import com.zaxxer.hikari.HikariDataSource;
     entityManagerFactoryRef = "primaryEntityManagerFactory",
     transactionManagerRef = "primaryTransactionManager"
 )
+@SuppressWarnings("java:S4449")
 public class PrimaryDataSourceConfig {
 
     @Primary
