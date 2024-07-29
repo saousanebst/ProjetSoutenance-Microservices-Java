@@ -1,4 +1,4 @@
-package fr.projet.Response;
+package fr.projet.response;
 
 import java.time.LocalDate;
 
