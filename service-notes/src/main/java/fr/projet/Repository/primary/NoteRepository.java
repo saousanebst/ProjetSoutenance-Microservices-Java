@@ -1,4 +1,4 @@
-package fr.projet.Repository.primary;
+package fr.projet.repository.primary;
 
 import java.util.List;
 

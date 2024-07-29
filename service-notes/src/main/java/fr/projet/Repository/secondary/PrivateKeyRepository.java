@@ -1,4 +1,4 @@
-package fr.projet.Repository.secondary;
+package fr.projet.repository.secondary;
 
 import java.util.Optional;
 
