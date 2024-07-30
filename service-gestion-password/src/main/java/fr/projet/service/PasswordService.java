@@ -144,8 +144,7 @@ public void resetPassword(String token, String newPassword) {
         throw new ResetPasswordException("User with email not found");
     }
     
-    // Hash le nouveau mot de passe
-    // String hashedPassword = hashPassword(newPassword);
+    
     
     // Mettre à jour le mot de passe dans le service utilisateur via Feign Client
     userServiceClient.updateUserPassword(utilisateurDTO.getId(), newPassword);
